@@ -1,0 +1,30 @@
+{
+  "name": "zettelkastenassistant",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/carvalhocortes/ZettelkastenAssistant.git"
+  },
+  "keywords": [
+    "Zettelkasten",
+    "mendeley",
+    "docalysis",
+    "ai"
+  ],
+  "author": "CarvalhoCortes",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/carvalhocortes/ZettelkastenAssistant/issues"
+  },
+  "homepage": "https://github.com/carvalhocortes/ZettelkastenAssistant#readme",
+  "dependencies": {
+    "axios": "^1.5.1",
+    "serverless": "^3.35.2",
+    "uuid": "^9.0.1"
+  }
+}
