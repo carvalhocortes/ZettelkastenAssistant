@@ -1,19 +1,23 @@
-# Dependency directories
-node_modules/
-jspm_packages
+# deploy files
+config.yml
+.build
 
-# Snowpack dependency directory (https://snowpack.dev/)
-web_modules/
-
-# dotenv environment variable files
-.env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
+# package directories
+node_modules
+npm-debug.log
 
 # Serverless directories
-.serverless/
+.serverless
 
-# DynamoDB Local files
-.dynamodb/
+# .VSCode
+.nycrc
+
+# tests and lint
+.sonarlint
+.nyc_output
+.scannerwork
+coverage
+xunit.xml
+
+#secrets
+src/connectors/secrets.json
