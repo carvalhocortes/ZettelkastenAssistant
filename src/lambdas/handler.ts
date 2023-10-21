@@ -1,18 +1,22 @@
-'use strict'
+import { Handler } from 'aws-lambda';
 
-import { HttpResponse } from '../types/commonTypes'
-
-export const hello = (event: Event): HttpResponse => {
-  return {
+export const hello: Handler = (event: any) => {
+  const response = {
     statusCode: 200,
-    headers: {
-      'Content-Type': 'application/json'
-    },
     body: JSON.stringify(
       {
-        message: 'Hello world',
+        message: 'Go Serverless v1.0! Your function executed successfully!',
         input: event,
-      }
-    )
-  }
+      },
+      null,
+      2
+    ),
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  };
+
+  return new Promise((resolve) => {
+    resolve(response)
+  })
 }
