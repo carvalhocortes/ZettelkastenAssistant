@@ -2,23 +2,26 @@ app: zettelkasten-assistant
 service: zettelkasten-assistant
 frameworkVersion: '3'
 
+plugins:
+  - serverless-plugin-typescript
+
 provider:
   name: aws
   runtime: nodejs16.x
   region: us-east-2
-  stage: ${opt:stage}
+  # stage: ${opt:stage}
 
 functions:
   hello:
-    handler: handler.hello
+    handler: src/lambdas/handler.hello
     events:
       - httpApi:
           path: /
           method: get
 
-  environment:
-    FILES_BUCKET: ForeignExchangeBucket-${opt:stage}
-    MENDELEY_CLIENT_ID: ${file(config.yml):MENDELEY_CLIENT_ID}
-    MENDELEY_CLIENT_SECRET: ${file(config.yml):MENDELEY_CLIENT_SECRET}
-    DOCALYSIS_CLIENT_ID: ${file(config.yml):DOCALYSIS_CLIENT_ID}
-    DOCALYSIS_CLIENT_SECRET: ${file(config.yml):DOCALYSIS_CLIENT_SECRET}
+  # environment:
+    # FILES_BUCKET: zettelkasten-${opt:stage}
+    # MENDELEY_CLIENT_ID: ${ssm:/zettelkasten/MENDELEY_CLIENT_ID}
+    # MENDELEY_CLIENT_SECRET: ${ssm:/zettelkasten/MENDELEY_CLIENT_SECRET}
+    # DOCALYSIS_CLIENT_ID: ${ssm:/zettelkasten/DOCALYSIS_CLIENT_ID}
+    # DOCALYSIS_CLIENT_SECRET: ${ssm:/zettelkasten/DOCALYSIS_CLIENT_SECRET}
