@@ -1,5 +1,0 @@
-{
-  "require": "./register.js",
-  "timeout": 60000,
-  "bail": true
-}

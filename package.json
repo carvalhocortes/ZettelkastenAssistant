@@ -2,45 +2,32 @@
   "name": "zettelkastenassistant",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/carvalhocortes/ZettelkastenAssistant.git"
-  },
   "keywords": [
     "Zettelkasten",
     "mendeley",
     "docalysis",
     "ai"
   ],
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "author": "CarvalhoCortes",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/carvalhocortes/ZettelkastenAssistant.git"
+  },
   "bugs": {
     "url": "https://github.com/carvalhocortes/ZettelkastenAssistant/issues"
   },
   "homepage": "https://github.com/carvalhocortes/ZettelkastenAssistant#readme",
-  "dependencies": {
-    "axios": "^1.5.1",
-    "uuid": "^9.0.1"
-  },
   "devDependencies": {
-    "@serverless/typescript": "^3.30.1",
-    "@types/aws-lambda": "^8.10.119",
-    "@types/node": "^20.5.4",
-    "@typescript-eslint/eslint-plugin": "^6.4.1",
-    "@typescript-eslint/parser": "^6.4.1",
-    "aws-sdk": "^2.1443.0",
-    "eslint": "^8.47.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-prettier": "^5.0.0",
-    "prettier": "^3.0.2",
-    "serverless": "^3.35.2",
-    "serverless-plugin-typescript": "^2.1.5",
-    "should": "^13.2.3",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.1.6"
+    "aws-sdk": "^2.1478.0",
+    "serverless-offline": "^13.2.0"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.2.0"
   }
 }

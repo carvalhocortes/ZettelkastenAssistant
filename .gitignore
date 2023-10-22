@@ -1,22 +1,6 @@
-# deploy files
-.build
-
 # package directories
 node_modules
-npm-debug.log
+jspm_packages
 
 # Serverless directories
 .serverless
-
-# .VSCode
-.nycrc
-
-# tests and lint
-.sonarlint
-.nyc_output
-.scannerwork
-coverage
-xunit.xml
-
-#secrets
-src/connectors/secrets.json

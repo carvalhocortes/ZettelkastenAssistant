@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   dateFormats: {
     dateFormat: 'YYYY-MM-DD',
     dateTimeFormat: 'YYYY-MM-DD HH:mm:ss'
@@ -9,4 +9,4 @@ export default {
     'docx',
     'txt'
   ],
-} as const
+}
