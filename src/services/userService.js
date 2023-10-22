@@ -12,7 +12,7 @@ const hashPassword = password => pbkdf2Sync(password, salt, 100000, 64, 'sha512'
 
 const makeLogin = async (username, password) => {
   const hashedPassword = hashPassword(password)
-  const user = await userDb.findUserByNameAndPassword(username, hashedPassword)
+  const user = await userDb.getUserByCredentials(username, hashedPassword)
   if (!user) throw errors.invalidLogin
   const token = sign({ username, id: user._id}, jwtSecret, { expiresIn: '24h', audience: 'zettelkasten'})
   return { token }
@@ -21,11 +21,11 @@ const makeLogin = async (username, password) => {
 const createNewUser = async (body) => {
   const { username, password } = body
   const hashedPassword = hashPassword(password)
-  let user = await userDb.findUserByNameAndPassword(username, hashedPassword)
+  let user = await userDb.getUserByCredentials(username, hashedPassword)
   if (user) return user
   const assembledUser = assembleNewUser(body)
-  await userDb.saveUser(assembledUser)
-  return userDb.findUserByNameAndPassword(username, hashedPassword)
+  const { insertedId } = await userDb.saveUser(assembledUser)
+  return userDb.getUser(insertedId)
 }
 
 const getUser = async (id) => {

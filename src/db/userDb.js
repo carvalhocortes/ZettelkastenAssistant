@@ -19,7 +19,7 @@ const getUsersTable = async () => {
   return tableInstance
 }
 
-const findUserByNameAndPassword  = async (username, hashedPassword) => {
+const getUserByCredentials  = async (username, hashedPassword) => {
   const userTable = await getUsersTable()
   return userTable.findOne({
   name: username,
@@ -39,5 +39,5 @@ const getUser = async (userID) => {
 module.exports = {
   saveUser,
   getUser,
-  findUserByNameAndPassword
+  getUserByCredentials
 }
