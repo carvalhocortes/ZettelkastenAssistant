@@ -1,5 +1,4 @@
 const { MongoClient, ObjectId } = require('mongodb')
-const errors = require ('../common/errorMessages')
 
 let connectionInstance = null
 let tableInstance = null
