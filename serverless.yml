@@ -30,13 +30,6 @@ provider:
     # DOCALYSIS_CLIENT_SECRET: ${ssm:/zettelkasten/DOCALYSIS_CLIENT_SECRET}
 
 functions:
-  helloWorld:
-    handler: /src/lambda/hello.handler
-    events:
-      - httpApi:
-          path: /hello
-          method: get
-
   login:
     handler: /src/lambda/user.authenticate
     events:
@@ -57,13 +50,6 @@ functions:
       - httpApi:
           path: /user/{id}
           method: get
-
-  # listUser:
-  #   handler: /src/lambda/user.get
-  #   events:
-  #     - httpApi:
-  #         path: /user/all
-  #         method: get
 
 plugins:
   - serverless-offline
