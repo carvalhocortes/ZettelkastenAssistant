@@ -9,7 +9,7 @@ const dynamoDB = new AWS.DynamoDB.DocumentClient()
 
 // const getById = async (userId) => {}
 
-const getByCredentials = ({username, password}) => {
+const getByCredentials = async (username, password) => {
   const params = {
     TableName: tableName,
     IndexName: 'credentialsIndex',
@@ -23,7 +23,8 @@ const getByCredentials = ({username, password}) => {
       ':passwordVal': password
     }
   }
-  return dynamoDB.query(params)
+  const result = await dynamoDB.query(params).promise()
+  return result.Items[0];
 }
 
 // const save = async (user) => {}

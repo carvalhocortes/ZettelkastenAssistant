@@ -30,7 +30,8 @@ provider:
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
           Resource:
-            - arn:aws:dynamodb:us-east-2:180514372124:table/zettelkasten-users-${self:provider.stage}
+            - arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/zettelkasten-users-${opt:stage}
+            - arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/zettelkasten-users-${opt:stage}/*
 
   environment:
     SHOW_LOGS: true
@@ -53,3 +54,6 @@ functions:
       - httpApi:
           path: /login
           method: post
+
+plugins:
+  - serverless-offline

@@ -4,7 +4,6 @@ const userService = require('../services/userService')
 
 const authenticate = async (event) => {
   try {
-    console.log('entrou no lambda')
     const { username, password } = validateLogin(event)
     const token = await userService.authenticateUser(username, password)
     return success(token)

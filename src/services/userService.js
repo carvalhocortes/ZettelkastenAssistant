@@ -11,18 +11,16 @@ const jwtSecret = process.env.JWT_SECRET
 const hashPassword = password => pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex')
 
 const authenticateUser = async (username, password) => {
-  console.log('entrou no service')
   const hashedPassword = hashPassword(password)
   const user = await userDb.getByCredentials(username, hashedPassword)
   if (!user) throw errors.invalidLogin
-  console.log('usuario logado', user)
-  const token = sign({ username, id: user.id}, jwtSecret, { expiresIn: '24h', audience: 'zettelkasten'})
+  const token = sign({ username, id: user.id }, jwtSecret, { expiresIn: '24h', audience: 'zettelkasten'})
   return { token }
 }
 
-// const getUser = async (id) => {
-//   return userDb.getUser(id)
-// }
+const getUser = async (username) => {
+  return userDb.getUser(username)
+}
 
 // const saveUser = async (body) => {
 //   const { username, password } = body

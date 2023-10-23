@@ -21,7 +21,7 @@ const buildHttp = (code, body) => {
   const response = {
     statusCode: code,
     body: serializeResponseBody(body),
-    // headers: { 'content-type': 'application/json' }
+    headers: { 'content-type': 'application/json' }
   }
   return response
 }
