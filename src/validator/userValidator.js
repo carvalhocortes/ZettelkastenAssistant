@@ -1,6 +1,7 @@
 const errors = require ('../common/errorMessages')
 
 const validateLogin = event => {
+  console.log('entrou no validation')
   if (!event.body) throw errors.requestValidationError('body')
   const body = JSON.parse(event.body)
   if (!body.username) throw errors.requestValidationError('username')

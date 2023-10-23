@@ -1,42 +1,38 @@
-const { MongoClient, ObjectId } = require('mongodb')
+const AWS = require('aws-sdk');
 
-let connectionInstance = null
-let tableInstance = null
+const tableName = process.env.USERS_TABLE
+const region = process.env.REGION
 
-const connectToDatabase = async () => {
-  if (connectionInstance) return connectionInstance
-  const client = new MongoClient(process.env.MONGODB_CONNECTIONSTRING)
-  const connection = await client.connect()
-  connectionInstance = connection.db(process.env.MONGODB_DB_NAME)
-  return connectionInstance
+AWS.config.update({ region })
+
+const dynamoDB = new AWS.DynamoDB.DocumentClient()
+
+// const getById = async (userId) => {}
+
+const getByCredentials = ({username, password}) => {
+  const params = {
+    TableName: tableName,
+    IndexName: 'credentialsIndex',
+    KeyConditionExpression: '#username = :usernameVal AND #password = :passwordVal',
+    ExpressionAttributeNames: {
+      '#username': 'username',
+      '#password': 'password'
+    },
+    ExpressionAttributeValues: {
+      ':usernameVal': username,
+      ':passwordVal': password
+    }
+  }
+  return dynamoDB.query(params)
 }
 
-const getUsersTable = async () => {
-  const db = await connectToDatabase()
-  if (tableInstance) return tableInstance
-  tableInstance = await db.collection('users')
-  return tableInstance
-}
+// const save = async (user) => {}
 
-const getUserByCredentials  = async (username, hashedPassword) => {
-  const userTable = await getUsersTable()
-  return userTable.findOne({
-  name: username,
-  password: hashedPassword
-})}
-
-const saveUser = async (user) => {
-  const userTable = await getUsersTable()
-  return userTable.insertOne(user)
-}
-
-const getUser = async (userID) => {
-  const userTable = await getUsersTable()
-  return userTable.findOne({ _id: new ObjectId(userID) })
-}
+// const update = async (updatedUser) => {}
 
 module.exports = {
-  saveUser,
-  getUser,
-  getUserByCredentials
+  // getById,
+  getByCredentials,
+  // save,
+  // update
 }
