@@ -37,7 +37,7 @@ const saveUser = async (body) => {
 const updateUser = async (pathParameters, body) => {
   const user = await userDb.getByUsername(pathParameters.username)
   if (!user) throw errors.inexistentUsername
-  const assembledUser = ''
+  const assembledUser = assembleUser(body)
   const updatedUser = await userDb.update(assembledUser)
   return assembleUserResponse(updatedUser)
 }
@@ -62,13 +62,14 @@ const updateUser = async (pathParameters, body) => {
 // PRIVATE FUNCTIONS
 
 const assembleUser = (user) => {
-  const user ={
+  const assembledUser ={
     username: user.username,
-    password: user.password ? hashPassword(user.password) : undefined
+    password: user.password ? hashPassword(user.password) : undefined,
+    ...user
   }
-  if (!user.username) delete user.password
-  if (!user.password) delete user.password
-  return user
+  if (!assembledUser.username) delete assembledUser.username
+  if (!assembledUser.password) delete assembledUser.password
+  return assembledUser
 }
 
 const assembleUserResponse = (user) => {

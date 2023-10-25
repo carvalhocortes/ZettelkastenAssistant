@@ -49,14 +49,14 @@ const save = async (user) => {
   return result
 }
 
-// const update = async (updatedUser, username) => {
-  // delete updatedUser.username;
-  // updatedUser.updatedAt = new Date().getTime()
-// }
+const update = async (updatedUser, username) => {
+  delete updatedUser.username;
+  updatedUser.updatedAt = new Date().getTime()
+}
 
 module.exports = {
   getByUsername,
   getByCredentials,
   save,
-  // update
+  update
 }
