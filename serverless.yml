@@ -55,5 +55,27 @@ functions:
           path: /login
           method: post
 
+
+  createUser:
+    handler: src/lambda/users.createUser
+    events:
+      - httpApi:
+          path: /user
+          method: post
+
+  getUser:
+    handler: src/lambda/users.getUser
+    events:
+      - httpApi:
+          path: /user/{username}
+          method: get
+
+  updateUser:
+    handler: src/lambda/users.getUser
+    events:
+      - httpApi:
+          path: /user/{username}
+          method: put
+
 plugins:
   - serverless-offline

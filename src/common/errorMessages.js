@@ -1,4 +1,4 @@
-const errorCode = c => 4765 + c
+const errorCode = c => 0 + c
 
 module.exports = {
   defaultError: {
@@ -31,10 +31,15 @@ module.exports = {
     code: errorCode(4),
     msg: 'Invalid Token'
   },
-  saveError: {
-    httpCode: 401,
+  inexistentUsername: {
+    httpCode: 404,
     code: errorCode(5),
-    msg: 'Error saving'
-  }
+    msg: 'Username inexistent'
+  },
+  invalidUpdateField: (fieldName) => ({
+    httpCode: 400,
+    code: errorCode(6),
+    msg: `The ${fieldName} field is not updateable`
+  })
 }
 

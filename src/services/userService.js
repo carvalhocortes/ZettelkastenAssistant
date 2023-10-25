@@ -19,24 +19,37 @@ const authenticateUser = async (username, password) => {
 }
 
 const getUser = async (username) => {
-  return userDb.getUser(username)
+  const user = await userDb.getByUsername(username)
+  if (!user) throw errors.inexistentUsername
+  return assembleUserResponse(user)
 }
 
-// const saveUser = async (body) => {
-//   const { username, password } = body
-//   const hashedPassword = hashPassword(password)
-//   let user = await userDb.getByCredentials(username, hashedPassword)
-//   if (user) return user
-//   const assembledUser = assembleNewUser(body)
-//   const { insertedId } = await userDb.save(assembledUser)
-//   return userDb.getById(insertedId)
+const saveUser = async (body) => {
+  const { username, password } = body
+  const hashedPassword = hashPassword(password)
+  let user = await userDb.getByCredentials(username, hashedPassword)
+  if (user) return assembleUserResponse(user)
+  const assembledUser = assembleUser(body)
+  const savedUser = await userDb.save(assembledUser)
+  return assembleUserResponse(savedUser)
+}
+
+const updateUser = async (pathParameters, body) => {
+  const user = await userDb.getByUsername(pathParameters.username)
+  if (!user) throw errors.inexistentUsername
+  const assembledUser = ''
+  const updatedUser = await userDb.update(assembledUser)
+  return assembleUserResponse(updatedUser)
+}
+
+// const deleteUser = async (body) => {
+//   const user = await userDb.getByUsername(body.username)
+//   if (!user) throw errors.inexistentUsername
+//   const deletedUser = ''
+//   return assembleUserResponse(deletedUser)
 // }
 
-// const updateUser = async (body) => {}
-
-// const deleteUser = async (body) => {}
-
-// const checkAuthorization = (event) => {
+// const checkUserAuthorization = (event) => {
 //   const { authorization } = event.headers
 //   if (!authorization) throw errors.nonAuthorized
 //   const [type, token] = authorization.split(' ')
@@ -46,18 +59,28 @@ const getUser = async (username) => {
 //   return decodedToken
 // }
 
-// // PRIVATE FUNCTIONS
+// PRIVATE FUNCTIONS
 
-// const assembleNewUser = (body) => ({
-//   name: body.username,
-//   password: hashPassword(body.password)
-// })
+const assembleUser = (user) => {
+  const user ={
+    username: user.username,
+    password: user.password ? hashPassword(user.password) : undefined
+  }
+  if (!user.username) delete user.password
+  if (!user.password) delete user.password
+  return user
+}
+
+const assembleUserResponse = (user) => {
+  delete user.password
+  return user
+}
 
 module.exports = {
   authenticateUser,
-  // getUser,
-  // saveUser,
-  // updateUser,
+  getUser,
+  saveUser,
+  updateUser,
   // deleteUser,
-  // checkAuthorization
+  // checkUserAuthorization
 }
