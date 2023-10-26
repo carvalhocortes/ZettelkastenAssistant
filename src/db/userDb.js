@@ -1,6 +1,7 @@
 const AWS = require('aws-sdk')
 const { assembleUpdateExpression } = require('../util/dynamoDbUtil')
 const constants = require('../common/constants')
+const { log } = require('../util/loggerUtil')
 
 const tableName = process.env.USERS_TABLE
 const region = process.env.REGION
@@ -44,6 +45,7 @@ const getByCredentials = async (username, password) => {
 
 const save = async (user) => {
   const status = constants.user.status.pending
+  user.updateHistory = []
   user.status = status
   user.statusLog = [{
     status: status,
@@ -66,7 +68,7 @@ const save = async (user) => {
 }
 
 const update = async (updateData, username) => {
-  if (updateData.username) delete updateData.username;
+  if (updateData.username) delete updateData.username
   updateData.updatedAt = new Date().getTime()
   const { updateExpression, expressionAttributeValues, expressionAttributeNames } = assembleUpdateExpression(updateData)
   const params = {

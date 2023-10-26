@@ -1,5 +1,6 @@
 
 const assembleUpdateExpression = (updateObject) => {
+  updateObject = sanitizeObject(updateObject)
   let updateExpression = 'SET '
   const expressionAttributeValues = {}
   const expressionAttributeNames = {}
@@ -13,6 +14,16 @@ const assembleUpdateExpression = (updateObject) => {
     }
   })
   return { updateExpression, expressionAttributeValues, expressionAttributeNames }
+}
+
+// PRIVATE FUNCTIONS
+
+const sanitizeObject = (updateObject) => {
+  for (const key in updateObject) {
+    if (updateObject[key] === undefined || updateObject[key] === null) {
+      delete updateObject[key]}
+  }
+  return updateObject
 }
 
 module.exports = {

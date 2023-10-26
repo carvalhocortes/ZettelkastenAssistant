@@ -72,4 +72,9 @@ module.exports = {
     code: errorCode(8),
     msg: `The password needs to be at least ${constants.user.passwordPolicy.size} characters and ${constants.user.passwordPolicy.especialCharacters} especial character. Look our password policy.`
   },
+  usernameNotAvailable: {
+    httpCode: 400,
+    code: errorCode(8),
+    msg: `This username is not available`
+  },
 }
