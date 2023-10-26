@@ -1,4 +1,6 @@
 const AWS = require('aws-sdk')
+const { assembleUpdateExpression } = require('../util/dynamoDbUtil')
+const constants = require('../common/constants')
 
 const tableName = process.env.USERS_TABLE
 const region = process.env.REGION
@@ -7,7 +9,8 @@ AWS.config.update({ region })
 
 const dynamoDB = new AWS.DynamoDB.DocumentClient()
 
-const getByUsername = async (username) => {const params = {
+const getByUsername = async (username) => {
+  const params = {
     TableName: tableName,
     KeyConditionExpression: '#username = :usernameVal',
     ExpressionAttributeNames: {
@@ -40,6 +43,19 @@ const getByCredentials = async (username, password) => {
 }
 
 const save = async (user) => {
+  const status = constants.user.status.pending
+  user.status = status
+  user.statusLog = [{
+    status: status,
+    at: new Date().getTime()
+  }]
+  user.loginData = {
+    wrongAttempts: 0,
+    lastLoginAt: 'never'
+  }
+  user.lastPasswords = [
+    user.password
+  ]
   user.createdAt = new Date().getTime()
   const params = {
     TableName: tableName,
@@ -49,9 +65,19 @@ const save = async (user) => {
   return result
 }
 
-const update = async (updatedUser, username) => {
-  delete updatedUser.username;
-  updatedUser.updatedAt = new Date().getTime()
+const update = async (updateData, username) => {
+  if (updateData.username) delete updateData.username;
+  updateData.updatedAt = new Date().getTime()
+  const { updateExpression, expressionAttributeValues, expressionAttributeNames } = assembleUpdateExpression(updateData)
+  const params = {
+    TableName: tableName,
+    Key: { 'username': username },
+    UpdateExpression: updateExpression,
+    ExpressionAttributeNames: expressionAttributeNames,
+    ExpressionAttributeValues: expressionAttributeValues,
+    ReturnValues: 'ALL_NEW'
+  }
+  return dynamoDB.update(params).promise().then(res => res.Attributes)
 }
 
 module.exports = {

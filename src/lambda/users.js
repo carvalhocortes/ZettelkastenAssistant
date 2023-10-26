@@ -4,8 +4,8 @@ const userService = require('../services/userService')
 
 const authenticate = async (event) => {
   try {
-    event = sanitizeEvent(event)
-    const { username, password } = userValidator.validateLogin(event)
+    const processedEvent = sanitizeEvent(event)
+    const { username, password } = userValidator.validateLogin(processedEvent)
     const token = await userService.authenticateUser(username, password)
     return success(token)
   } catch (err) {
@@ -15,10 +15,10 @@ const authenticate = async (event) => {
 
 const createUser = async (event) => {
   try {
-    event = sanitizeEvent(event)
-    const body = userValidator.validateCreateUser(event)
-    const user = await userService.saveUser(body)
-    return success(user)
+    const processedEvent = sanitizeEvent(event)
+    const body = userValidator.validateCreateUser(processedEvent)
+    const tokenNewUser = await userService.createUser(body)
+    return success(tokenNewUser)
   } catch (err) {
     return error(err)
   }
@@ -26,8 +26,8 @@ const createUser = async (event) => {
 
 const getUser = async (event) => {
   try {
-    event = sanitizeEvent(event)
-    const { username } = userValidator.validateGetUser(event)
+    const processedEvent = sanitizeEvent(event)
+    const { username } = userValidator.validateGetUser(processedEvent)
     const user = await userService.getUser(username)
     return success(user)
   } catch (err) {
@@ -37,42 +37,58 @@ const getUser = async (event) => {
 
 const updateUser = async (event) => {
   try {
-    event = sanitizeEvent(event)
-    const { pathParameters, body } = userValidator.validateUpdateUser(event)
-    const updatedUser = await userService.updateUser(pathParameters, body)
+    const processedEvent = sanitizeEvent(event)
+    const { pathParameters, body } = userValidator.validateUpdateUser(processedEvent)
+    const updatedUser = await userService.updateUser(pathParameters.username, body)
     return success(updatedUser)
   } catch (err) {
     return error(err)
   }
 }
 
-// const deleteUser = async (event) => {
-//   try {
-//     event = sanitizeEvent(event)
-//     return success(user)
-//   } catch (err) {
-//     return error(err)
-//   }
-// }
+const deleteUser = async (event) => {
+  try {
+    const processedEvent = sanitizeEvent(event)
+    const { username } = userValidator.validateDeleteUser(processedEvent)
+    const deletedUser = await userService.deleteUser(username)
+    return success(deletedUser)
+  } catch (err) {
+    return error(err)
+  }
+}
 
-// const unlockUser = async (event) => {
-//   try {
-//     event = sanitizeEvent(event)
+const activateUser = async (event) => {
+  try {
+    const processedEvent = sanitizeEvent(event)
+    const { token } = userValidator.validateActivateUser(processedEvent)
+    const unlockedUser = await userService.activateUser(token)
+    return success(unlockedUser)
+  } catch (err) {
+    return error(err)
+  }
+}
 
-//     return success(user)
-//   } catch (err) {
-//     return error(err)
-//   }
-// }
+const getUnlockToken = async (event) => {
+  try {
+    const processedEvent = sanitizeEvent(event)
+    const { username } = userValidator.validateGetUser(processedEvent)
+    const token = await userService.getUnlockToken(username)
+    return success(token)
+  } catch (err) {
+    return error(err)
+  }
+}
 
-// const changeUserCredentials = async (event) => {
-//   try {
-//     event = sanitizeEvent(event)
-//     return success(user)
-//   } catch (err) {
-//     return error(err)
-//   }
-// }
+const unlockUser = async (event) => {
+  try {
+    const processedEvent = sanitizeEvent(event)
+    const { password, token } = userValidator.validateUnlockUser(processedEvent)
+    const unlockedUser = await userService.unlockUser(password, token)
+    return success(unlockedUser)
+  } catch (err) {
+    return error(err)
+  }
+}
 
 
 module.exports = {
@@ -80,7 +96,8 @@ module.exports = {
   createUser,
   getUser,
   updateUser,
-  // deleteUser,
-  // unlockUser,
-  // changeUserCredentials
+  deleteUser,
+  activateUser,
+  getUnlockToken,
+  unlockUser
 }

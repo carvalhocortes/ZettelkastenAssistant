@@ -4,6 +4,11 @@ module.exports = {
     dateTimeFormat: 'YYYY-MM-DD HH:mm:ss'
   },
   user: {
+    passwordPolicy: {
+      size: 6,
+      especialCharacters: 1
+    },
+    maxWrongLoginAttempts: 5,
     status: {
       active: 'Active',
       locked: 'Locked',

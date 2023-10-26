@@ -1,3 +1,4 @@
+const constants = require('./constants')
 const errorCode = c => 0 + c
 
 module.exports = {
@@ -6,16 +7,16 @@ module.exports = {
     code: 0,
     msg: 'Internal error'
   },
-  requestValidationError: (fieldName) => ({
+  requiredField: (fieldName) => ({
     httpCode: 400,
     code: errorCode(0),
     msg: `The field ${fieldName} are mandatory`
   }),
-  invalidLogin:{
+  invalidPassword:(remainingAttempts) => ({
     httpCode: 401,
     code: errorCode(1),
-    msg: 'Invalid Credentials'
-  },
+    msg: `Invalid Password. You have ${remainingAttempts} attempts left`
+  }),
   nonAuthorized: {
     httpCode: 401,
     code: errorCode(2),
@@ -31,15 +32,44 @@ module.exports = {
     code: errorCode(4),
     msg: 'Invalid Token'
   },
-  inexistentUsername: {
+  inexistentUsername: (username) => ({
     httpCode: 404,
     code: errorCode(5),
-    msg: 'Username inexistent'
-  },
+    msg: `${username} not registered.`
+  }),
   invalidUpdateField: (fieldName) => ({
     httpCode: 400,
     code: errorCode(6),
     msg: `The ${fieldName} field is not updateable`
-  })
+  }),
+  alreadyActiveUser: {
+    httpCode: 400,
+    code: errorCode(7),
+    msg: 'User is already active'
+  },
+  inactivatedUser: {
+    httpCode: 400,
+    code: errorCode(8),
+    msg: 'Is necessary to activate this user'
+  },
+  lockedUser: {
+    httpCode: 400,
+    code: errorCode(8),
+    msg: 'This user was locked, change the password to unlock it'
+  },
+  userNotLocked: (username) => ({
+    httpCode: 400,
+    code: errorCode(8),
+    msg: `${username} was not locked.`
+  }),
+  passwordAlreadyUsed: {
+    httpCode: 400,
+    code: errorCode(8),
+    msg: 'This password is already used. Try a different password.'
+  },
+  invalidPasswordSchema: {
+    httpCode: 400,
+    code: errorCode(8),
+    msg: `The password needs to be at least ${constants.user.passwordPolicy.size} characters and ${constants.user.passwordPolicy.especialCharacters} especial character. Look our password policy.`
+  },
 }
-

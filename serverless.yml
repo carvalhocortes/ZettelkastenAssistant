@@ -55,7 +55,6 @@ functions:
           path: /login
           method: post
 
-
   createUser:
     handler: src/lambda/users.createUser
     events:
@@ -71,11 +70,37 @@ functions:
           method: get
 
   updateUser:
-    handler: src/lambda/users.getUser
+    handler: src/lambda/users.updateUser
     events:
       - httpApi:
           path: /user/{username}
           method: put
 
-plugins:
-  - serverless-offline
+  deleteUser:
+    handler: src/lambda/users.deleteUser
+    events:
+      - httpApi:
+          path: /user/{username}
+          method: delete
+
+  activateUser:
+    handler: src/lambda/users.activateUser
+    events:
+      - httpApi:
+          path: /user/activate/{token}
+          method: put
+
+  getUnlockToken:
+    handler: src/lambda/users.getUnlockToken
+    events:
+      - httpApi:
+          path: /user/unlock/{username}
+          method: get
+
+  unlockUser:
+    handler: src/lambda/users.unlockUser
+    events:
+      - httpApi:
+          path: /user/unlock
+          method: put
+

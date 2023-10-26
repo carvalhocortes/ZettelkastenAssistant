@@ -7,7 +7,7 @@ const success = (body, status = 200) => {
 }
 
 const error = (err) => {
-  console.log(err)
+  log({ err })
   if (isUndefined(err.httpCode && err.code && err.msg)) {
     err = errors.defaultError
   }
