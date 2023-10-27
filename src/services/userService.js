@@ -61,7 +61,8 @@ const createUser = async (body) => {
       updateData.status = newStatus
       updateData.statusLog = [...user.statusLog, { status: newStatus, at: new Date().getTime()}]
       updateData.loginData = { wrongAttempts: 0 }
-      await userDb.update(updateData, username)
+      const fieldsToDelete = user
+      await userDb.update(updateData, username, fieldsToDelete)
       return { token }
     }
     throw errors.usernameNotAvailable
@@ -190,10 +191,10 @@ const assembleUpdate = (updateFields, user) => {
 }
 
 const assembleChangedFields = (newFields, oldFields) => {
-  const assembledChangedFields = []
+  const assembledChangedFields = {}
   for (const key in newFields) {
     if (oldFields.hasOwnProperty(key) && oldFields[key] !== newFields[key]) {
-      assembledChangedFields.push({ [key]: oldFields[key] })
+      assembledChangedFields[key] = oldFields[key]
     }
   }
   if (assembledChangedFields.length < 1) return

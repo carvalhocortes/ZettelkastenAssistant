@@ -45,7 +45,6 @@ const getByCredentials = async (username, password) => {
 
 const save = async (user) => {
   const status = constants.user.status.pending
-  user.updateHistory = []
   user.status = status
   user.statusLog = [{
     status: status,
@@ -67,10 +66,11 @@ const save = async (user) => {
   return result
 }
 
-const update = async (updateData, username) => {
+const update = async (updateData, username, keysToDelete) => {
   if (updateData.username) delete updateData.username
   updateData.updatedAt = new Date().getTime()
-  const { updateExpression, expressionAttributeValues, expressionAttributeNames } = assembleUpdateExpression(updateData)
+  const { updateExpression, expressionAttributeValues, expressionAttributeNames } = assembleUpdateExpression(updateData, keysToDelete)
+  console.log({ updateExpression, expressionAttributeValues, expressionAttributeNames })
   const params = {
     TableName: tableName,
     Key: { 'username': username },

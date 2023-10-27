@@ -1,5 +1,5 @@
 
-const assembleUpdateExpression = (updateObject) => {
+const assembleUpdateExpression = (updateObject, keysToDelete) => {
   updateObject = sanitizeObject(updateObject)
   let updateExpression = 'SET '
   const expressionAttributeValues = {}
@@ -13,6 +13,22 @@ const assembleUpdateExpression = (updateObject) => {
       updateExpression += ', '
     }
   })
+  if (keysToDelete){
+    delete keysToDelete.username
+    delete keysToDelete.password
+    delete keysToDelete.createdAt
+    updateExpression += ' remove '
+    Object.keys(keysToDelete).forEach((key, index, keys) => {
+      if (!Object.keys(updateObject).includes(key)){
+        expressionAttributeNames[`#${key}`] = key
+        if (index >= keys.length - 1) {
+          updateExpression += `#${key}, `
+        } else {
+          updateExpression += `#${key}`
+        }
+      }
+    })
+  }
   return { updateExpression, expressionAttributeValues, expressionAttributeNames }
 }
 
