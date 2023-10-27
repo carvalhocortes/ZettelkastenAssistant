@@ -10,32 +10,32 @@ AWS.config.update({ region })
 
 const dynamoDB = new AWS.DynamoDB.DocumentClient()
 
-const getByUsername = async (username) => {
+const getByEmail = async (email) => {
   const params = {
     TableName: tableName,
-    KeyConditionExpression: '#username = :usernameVal',
+    KeyConditionExpression: '#email = :emailVal',
     ExpressionAttributeNames: {
-      '#username': 'username'
+      '#email': 'email'
     },
     ExpressionAttributeValues: {
-      ':usernameVal': username
+      ':emailVal': email
     }
   }
   const result = await dynamoDB.query(params).promise()
   return result.Items[0]
 }
 
-const getByCredentials = async (username, password) => {
+const getByCredentials = async (email, password) => {
   const params = {
     TableName: tableName,
     IndexName: 'credentialsIndex',
-    KeyConditionExpression: '#username = :usernameVal AND #password = :passwordVal',
+    KeyConditionExpression: '#email = :emailVal AND #password = :passwordVal',
     ExpressionAttributeNames: {
-      '#username': 'username',
+      '#email': 'email',
       '#password': 'password'
     },
     ExpressionAttributeValues: {
-      ':usernameVal': username,
+      ':emailVal': email,
       ':passwordVal': password
     }
   }
@@ -66,14 +66,14 @@ const save = async (user) => {
   return result
 }
 
-const update = async (updateData, username, keysToDelete) => {
-  if (updateData.username) delete updateData.username
+const update = async (updateData, email, keysToDelete) => {
+  if (updateData.email) delete updateData.email
   updateData.updatedAt = new Date().getTime()
   const { updateExpression, expressionAttributeValues, expressionAttributeNames } = assembleUpdateExpression(updateData, keysToDelete)
   console.log({ updateExpression, expressionAttributeValues, expressionAttributeNames })
   const params = {
     TableName: tableName,
-    Key: { 'username': username },
+    Key: { 'email': email },
     UpdateExpression: updateExpression,
     ExpressionAttributeNames: expressionAttributeNames,
     ExpressionAttributeValues: expressionAttributeValues,
@@ -83,7 +83,7 @@ const update = async (updateData, username, keysToDelete) => {
 }
 
 module.exports = {
-  getByUsername,
+  getByEmail,
   getByCredentials,
   save,
   update

@@ -32,10 +32,10 @@ module.exports = {
     code: errorCode(4),
     msg: 'Invalid Token'
   },
-  inexistentUsername: (username) => ({
+  inexistentEmail: (email) => ({
     httpCode: 404,
     code: errorCode(5),
-    msg: `${username} not registered.`
+    msg: `${email} not registered.`
   }),
   invalidUpdateField: (fieldName) => ({
     httpCode: 400,
@@ -57,10 +57,10 @@ module.exports = {
     code: errorCode(8),
     msg: 'This user was locked, change the password to unlock it'
   },
-  userNotLocked: (username) => ({
+  userNotLocked: (email) => ({
     httpCode: 400,
     code: errorCode(8),
-    msg: `${username} was not locked.`
+    msg: `${email} was not locked.`
   }),
   passwordAlreadyUsed: {
     httpCode: 400,
@@ -72,9 +72,9 @@ module.exports = {
     code: errorCode(8),
     msg: `The password needs to be at least ${constants.user.passwordPolicy.size} characters and ${constants.user.passwordPolicy.especialCharacters} especial character. Look our password policy.`
   },
-  usernameNotAvailable: {
+  emailNotAvailable: {
     httpCode: 400,
     code: errorCode(8),
-    msg: `This username is not available`
+    msg: `This email is not available`
   },
 }

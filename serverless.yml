@@ -66,21 +66,21 @@ functions:
     handler: src/lambda/users.getUser
     events:
       - httpApi:
-          path: /user/{username}
+          path: /user/{email}
           method: get
 
   updateUser:
     handler: src/lambda/users.updateUser
     events:
       - httpApi:
-          path: /user/{username}
+          path: /user/{email}
           method: put
 
   deleteUser:
     handler: src/lambda/users.deleteUser
     events:
       - httpApi:
-          path: /user/{username}
+          path: /user/{email}
           method: delete
 
   activateUser:
@@ -94,7 +94,7 @@ functions:
     handler: src/lambda/users.getUnlockToken
     events:
       - httpApi:
-          path: /user/unlock/{username}
+          path: /user/unlock/{email}
           method: get
 
   unlockUser:

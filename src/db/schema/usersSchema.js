@@ -11,7 +11,7 @@ const dynamoDB = new AWS.DynamoDB()
 const credentialsIndex = {
   IndexName: 'credentialsIndex',
   KeySchema: [
-    { AttributeName: 'username', KeyType: 'HASH' },
+    { AttributeName: 'email', KeyType: 'HASH' },
     { AttributeName: 'password', KeyType: 'RANGE' }
   ],
   Projection: { ProjectionType: 'ALL' }
@@ -27,7 +27,7 @@ dynamoDB.describeTable({ TableName: tableName }, (err, data) => {
               KeyType: 'HASH'
             },
             {
-              AttributeName: 'username',
+              AttributeName: 'email',
               KeyType: 'RANGE'
             }
           ],
@@ -37,7 +37,7 @@ dynamoDB.describeTable({ TableName: tableName }, (err, data) => {
               AttributeType: 'S'
             },
             {
-              AttributeName: 'username',
+              AttributeName: 'email',
               AttributeType: 'S'
             },
             {

@@ -11,8 +11,8 @@ const jwtSecret = process.env.JWT_SECRET
 
 const hashPassword = password => pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex')
 
-const authenticateUser = async (username, password) => {
-  const user = await getUserAdmin(username)
+const authenticateUser = async (email, password) => {
+  const user = await getUserAdmin(email)
   if (user.status === constants.user.status.pending) throw errors.inactivatedUser
   if (user.status === constants.user.status.locked) throw errors.lockedUser
   if (hashPassword(password) !== user.password) {
@@ -24,7 +24,7 @@ const authenticateUser = async (username, password) => {
           lastLoginAt: user.loginData.lastLoginAt
         }
       }
-      await userDb.update(loginUpdate, username)
+      await userDb.update(loginUpdate, email)
       throw errors.invalidPassword(constants.user.maxWrongLoginAttempts - wrongAttempts)
     }
     await changeStatus (user, constants.user.status.locked)
@@ -36,72 +36,72 @@ const authenticateUser = async (username, password) => {
       lastLoginAt: new Date().getTime()
     }
   }
-  await userDb.update(loginUpdate, username)
-  return { token: sign({ username }, jwtSecret, { expiresIn: '24h', audience: 'zettelkasten'}) }
+  await userDb.update(loginUpdate, email)
+  return { token: sign({ email }, jwtSecret, { expiresIn: '24h', audience: 'zettelkasten'}) }
 }
 
-const getUser = async (username) => {
-  const user = await getUserAdmin(username)
+const getUser = async (email) => {
+  const user = await getUserAdmin(email)
   return assembleUserResponse(user)
 }
 
 const createUser = async (body) => {
-  const { username, password } = body
+  const { email, password } = body
   if (!isValidPassword(password)) throw errors.invalidPasswordSchema
   const hashedPassword = hashPassword(password)
   body.password = hashedPassword
-  const user = await userDb.getByUsername(username)
-  const token = sign({ username }, jwtSecret, { expiresIn: '2h', audience: 'activeUser' })
+  const user = await userDb.getByEmail(email)
+  const token = sign({ email }, jwtSecret, { expiresIn: '2h', audience: 'activeUser' })
   if (user) {
     if (user && user?.status === constants.user.status.pending) return { token }
     if (user && user?.status === constants.user.status.deleted) {
       const newStatus = constants.user.status.pending
-      const updateData = assembleUpdate(body, user)
+      const updateData = assembleUpdate(assembleUser(body), user)
       updateData.lastPasswords = [hashedPassword]
       updateData.status = newStatus
       updateData.statusLog = [...user.statusLog, { status: newStatus, at: new Date().getTime()}]
       updateData.loginData = { wrongAttempts: 0 }
       const fieldsToDelete = user
-      await userDb.update(updateData, username, fieldsToDelete)
+      await userDb.update(updateData, email, fieldsToDelete)
       return { token }
     }
-    throw errors.usernameNotAvailable
+    throw errors.emailNotAvailable
   }
   const assembledUser = assembleUser(body)
   await userDb.save(assembledUser)
   return { token }
 }
 
-const updateUser = async (username, body) => {
-  const user = await getUserAdmin(username)
+const updateUser = async (email, body) => {
+  const user = await getUserAdmin(email)
   const updateData = assembleUpdate(body, user)
-  const updatedUser = await userDb.update(updateData, username)
+  const updatedUser = await userDb.update(updateData, email)
   return assembleUserResponse(updatedUser)
 }
 
-const deleteUser = async (username) => {
-  const user = await getUserAdmin(username)
+const deleteUser = async (email) => {
+  const user = await getUserAdmin(email)
   const deletedUser = await changeStatus (user, constants.user.status.deleted)
   return assembleUserResponse(deletedUser)
 }
 
 const activateUser = async (token) => {
-  const { username } = checkTokenAndAudience(token, 'activeUser')
-  const user = await getUserAdmin(username)
+  const { email } = checkTokenAndAudience(token, 'activeUser')
+  const user = await getUserAdmin(email)
   if (user.status !== constants.user.status.pending) throw errors.alreadyActiveUser
   const activatedUser = await changeStatus (user, constants.user.status.active)
   return assembleUserResponse(activatedUser)
 }
 
-const getUnlockToken = async (username) =>{
-  const user = await getUserAdmin(username)
-  if (user.status !== constants.user.status.locked) throw errors.userNotLocked(username)
-  return { token: sign({ username }, jwtSecret, { expiresIn: '2h', audience: 'unlockUser' }) }
+const getUnlockToken = async (email) =>{
+  const user = await getUserAdmin(email)
+  if (user.status !== constants.user.status.locked) throw errors.userNotLocked(email)
+  return { token: sign({ email }, jwtSecret, { expiresIn: '2h', audience: 'unlockUser' }) }
 }
 
 const unlockUser = async (newPassword, token) => {
-  const { username } = checkTokenAndAudience(token, 'unlockUser')
-  const user = await getUserAdmin(username)
+  const { email } = checkTokenAndAudience(token, 'unlockUser')
+  const user = await getUserAdmin(email)
   const lastPasswords = user.lastPasswords
   if (!isValidPassword(newPassword)) throw errors.invalidPasswordSchema
   const hashedPassword = hashPassword(newPassword)
@@ -123,7 +123,7 @@ const unlockUser = async (newPassword, token) => {
     status: newStatus,
     statusLog
   }
-  const updatedUser = await userDb.update(passwordUpdate, username)
+  const updatedUser = await userDb.update(passwordUpdate, email)
   return assembleUserResponse(updatedUser)
 }
 
@@ -138,9 +138,9 @@ const checkUserAuthorization = (event) => {
 
 // PRIVATE FUNCTIONS
 
-const getUserAdmin = async (username) => {
-  const user = await userDb.getByUsername(username)
-  if (!user || user.status === constants.user.status.deleted) throw errors.inexistentUsername(username)
+const getUserAdmin = async (email) => {
+  const user = await userDb.getByEmail(email)
+  if (!user || user.status === constants.user.status.deleted) throw errors.inexistentEmail(email)
   return user
 }
 
@@ -168,23 +168,24 @@ const countSpecialCharacters = (text) => {
 
 const assembleUser = (user) => {
   const assembledUser = {
-    username: user.username,
+    email: user.email,
     password: user.password ? hashPassword(user.password) : undefined,
-    ...user
-  }
-  if (!assembledUser.username) delete assembledUser.username
+    birthDate: user.birthDate,
+    avatar: user.avatar,
+    city: user.city,
+    country: user.country
+    }
+  if (!assembledUser.email) delete assembledUser.email
   if (!assembledUser.password) delete assembledUser.password
   return assembledUser
 }
 
 const assembleUpdate = (updateFields, user) => {
-  delete updateFields.password
-  delete updateFields.username
+  delete updateFields.email
   const changedData = assembleChangedFields(updateFields, user)
   const updateHistory = changedData ? (user.updateHistory ? [...user.updateHistory, changedData] : [changedData]) : undefined
   const assembledUpdate = {
     ...updateFields,
-    password: updateFields.password ? hashPassword(updateFields.password) : undefined,
     updateHistory
   }
   return assembledUpdate
@@ -216,7 +217,7 @@ const changeStatus = (user, newStatus) => {
     status: newStatus,
     statusLog
   }
-  return userDb.update(updateData, user.username)
+  return userDb.update(updateData, user.email)
 }
 
 module.exports = {

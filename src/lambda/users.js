@@ -5,8 +5,8 @@ const userService = require('../services/userService')
 const authenticate = async (event) => {
   try {
     const processedEvent = sanitizeEvent(event)
-    const { username, password } = userValidator.validateLogin(processedEvent)
-    const token = await userService.authenticateUser(username, password)
+    const { email, password } = userValidator.validateLogin(processedEvent)
+    const token = await userService.authenticateUser(email, password)
     return success(token)
   } catch (err) {
     return error(err)
@@ -27,8 +27,8 @@ const createUser = async (event) => {
 const getUser = async (event) => {
   try {
     const processedEvent = sanitizeEvent(event)
-    const { username } = userValidator.validateGetUser(processedEvent)
-    const user = await userService.getUser(username)
+    const { email } = userValidator.validateGetUser(processedEvent)
+    const user = await userService.getUser(email)
     return success(user)
   } catch (err) {
     return error(err)
@@ -39,7 +39,7 @@ const updateUser = async (event) => {
   try {
     const processedEvent = sanitizeEvent(event)
     const { pathParameters, body } = userValidator.validateUpdateUser(processedEvent)
-    const updatedUser = await userService.updateUser(pathParameters.username, body)
+    const updatedUser = await userService.updateUser(pathParameters.email, body)
     return success(updatedUser)
   } catch (err) {
     return error(err)
@@ -49,8 +49,8 @@ const updateUser = async (event) => {
 const deleteUser = async (event) => {
   try {
     const processedEvent = sanitizeEvent(event)
-    const { username } = userValidator.validateDeleteUser(processedEvent)
-    const deletedUser = await userService.deleteUser(username)
+    const { email } = userValidator.validateDeleteUser(processedEvent)
+    const deletedUser = await userService.deleteUser(email)
     return success(deletedUser)
   } catch (err) {
     return error(err)
@@ -71,8 +71,8 @@ const activateUser = async (event) => {
 const getUnlockToken = async (event) => {
   try {
     const processedEvent = sanitizeEvent(event)
-    const { username } = userValidator.validateGetUser(processedEvent)
-    const token = await userService.getUnlockToken(username)
+    const { email } = userValidator.validateGetUser(processedEvent)
+    const token = await userService.getUnlockToken(email)
     return success(token)
   } catch (err) {
     return error(err)
