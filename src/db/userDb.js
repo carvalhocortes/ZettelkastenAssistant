@@ -54,9 +54,6 @@ const save = async (user) => {
     wrongAttempts: 0,
     lastLoginAt: 'never'
   }
-  user.lastPasswords = [
-    user.password
-  ]
   user.createdAt = new Date().getTime()
   const params = {
     TableName: tableName,
@@ -70,7 +67,6 @@ const update = async (updateData, email, keysToDelete) => {
   if (updateData.email) delete updateData.email
   updateData.updatedAt = new Date().getTime()
   const { updateExpression, expressionAttributeValues, expressionAttributeNames } = assembleUpdateExpression(updateData, keysToDelete)
-  console.log({ updateExpression, expressionAttributeValues, expressionAttributeNames })
   const params = {
     TableName: tableName,
     Key: { 'email': email },

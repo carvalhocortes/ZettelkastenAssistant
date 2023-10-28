@@ -28,6 +28,7 @@ const validateUpdateUser = (event) => {
   if (!event.body) throw errors.requiredField('body')
   if (event.body.email) throw errors.invalidUpdateField('email')
   if (event.body.password) throw errors.invalidUpdateField('password')
+  if (event.body.status) throw errors.invalidUpdateField('status')
   return event
 }
 

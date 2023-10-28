@@ -57,7 +57,6 @@ const createUser = async (body) => {
     if (user && user?.status === constants.user.status.deleted) {
       const newStatus = constants.user.status.pending
       const updateData = assembleUpdate(assembleUser(body), user)
-      updateData.lastPasswords = [hashedPassword]
       updateData.status = newStatus
       updateData.statusLog = [...user.statusLog, { status: newStatus, at: new Date().getTime()}]
       updateData.loginData = { wrongAttempts: 0 }
@@ -74,6 +73,7 @@ const createUser = async (body) => {
 
 const updateUser = async (email, body) => {
   const user = await getUserAdmin(email)
+  // ver se tem password para atualizar, se sim, verificar se está  dentro do schema e adicionar o lastPasswords
   const updateData = assembleUpdate(body, user)
   const updatedUser = await userDb.update(updateData, email)
   return assembleUserResponse(updatedUser)
@@ -95,18 +95,19 @@ const activateUser = async (token) => {
 
 const getUnlockToken = async (email) =>{
   const user = await getUserAdmin(email)
-  if (user.status !== constants.user.status.locked) throw errors.userNotLocked(email)
-  return { token: sign({ email }, jwtSecret, { expiresIn: '2h', audience: 'unlockUser' }) }
+  if (user.status === constants.user.status.pending) return { token: sign({ email }, jwtSecret, { expiresIn: '2h', audience: 'activeUser' }) }
+  if (user.status === constants.user.status.locked) return { token: sign({ email }, jwtSecret, { expiresIn: '2h', audience: 'unlockUser' }) }
+  throw errors.userNotLocked(email)
 }
 
 const unlockUser = async (newPassword, token) => {
   const { email } = checkTokenAndAudience(token, 'unlockUser')
   const user = await getUserAdmin(email)
-  const lastPasswords = user.lastPasswords
   if (!isValidPassword(newPassword)) throw errors.invalidPasswordSchema
+  const lastPasswords = user.lastPasswords
   const hashedPassword = hashPassword(newPassword)
-  if (lastPasswords.includes(hashedPassword)) throw errors.passwordAlreadyUsed
-  lastPasswords.push(hashedPassword)
+  if (lastPasswords?.includes(hashedPassword)) throw errors.passwordAlreadyUsed
+  lastPasswords ? lastPasswords.push(user.password) : [user.password]
   const newStatus = constants.user.status.active
   const statusLog = user.statusLog
   statusLog.push({
@@ -167,28 +168,24 @@ const countSpecialCharacters = (text) => {
 }
 
 const assembleUser = (user) => {
-  const assembledUser = {
+  return {
     email: user.email,
-    password: user.password ? hashPassword(user.password) : undefined,
+    password: user.password,
     birthDate: user.birthDate,
     avatar: user.avatar,
     city: user.city,
     country: user.country
     }
-  if (!assembledUser.email) delete assembledUser.email
-  if (!assembledUser.password) delete assembledUser.password
-  return assembledUser
 }
 
 const assembleUpdate = (updateFields, user) => {
   delete updateFields.email
   const changedData = assembleChangedFields(updateFields, user)
   const updateHistory = changedData ? (user.updateHistory ? [...user.updateHistory, changedData] : [changedData]) : undefined
-  const assembledUpdate = {
+  return {
     ...updateFields,
     updateHistory
   }
-  return assembledUpdate
 }
 
 const assembleChangedFields = (newFields, oldFields) => {
@@ -198,7 +195,7 @@ const assembleChangedFields = (newFields, oldFields) => {
       assembledChangedFields[key] = oldFields[key]
     }
   }
-  if (assembledChangedFields.length < 1) return
+  if (Object.keys(assembledChangedFields).length < 1) return
   return { OldData: assembledChangedFields, at: new Date().getTime()}
 }
 
