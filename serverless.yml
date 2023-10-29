@@ -37,7 +37,7 @@ provider:
     SHOW_LOGS: true
     SALT: ${param:salt}
     JWT_SECRET: ${param:jwtSecret}
-    AWS_REGION: ${self:provider.region}
+    REGION: ${self:provider.region}
     FILES_BUCKET: zettelkasten-${opt:stage}
     USERS_TABLE: zettelkasten-users-${opt:stage}
     # MENDELEY_CLIENT_ID: ${ssm:/zettelkasten/MENDELEY_CLIENT_ID}

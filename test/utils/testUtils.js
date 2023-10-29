@@ -17,7 +17,8 @@ const testSuccess = async (lambda, event, statusCode = 200) => {
 }
 
 const testError = async (lambda, event, statusCode = 400, codeError) => {
-  const response = await lambda(event)
+  const usedEvent = JSON.parse(JSON.stringify(event))
+  const response = await lambda(usedEvent)
   should(response.statusCode).be.equal(statusCode)
   should(response.headers).have.property('content-type').be.equal('application/json')
   const body = JSON.parse(response.body)

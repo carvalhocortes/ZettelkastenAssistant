@@ -48,18 +48,18 @@ module.exports = {
     msg: 'User is already active'
   },
   inactivatedUser: {
-    httpCode: 400,
+    httpCode: 401,
     code: errorCode(8),
     msg: 'Is necessary to activate this user'
   },
   lockedUser: {
-    httpCode: 400,
-    code: errorCode(8),
+    httpCode: 401,
+    code: errorCode(9),
     msg: 'This user was locked, change the password to unlock it'
   },
   userNotLocked: (email) => ({
     httpCode: 400,
-    code: errorCode(8),
+    code: errorCode(10),
     msg: `${email} was not locked.`
   }),
   passwordAlreadyUsed: {

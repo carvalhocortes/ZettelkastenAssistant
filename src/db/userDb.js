@@ -1,12 +1,12 @@
 const AWS = require('aws-sdk')
 const { assembleUpdateExpression } = require('../util/dynamoDbUtil')
 const constants = require('../common/constants')
-const { log } = require('../util/loggerUtil')
 
 const tableName = process.env.USERS_TABLE
-const region = process.env.AWS_REGION
+const region = process.env.REGION
 
-AWS.config.update({ region, endpoint: process.env.DB_ENDPOINT, dynamoDbCrc32: false })
+if (process.env.DB_ENDPOINT?.includes('localhost')) AWS.config.update({ region, endpoint: process.env.DB_ENDPOINT })
+else AWS.config.update({ region })
 
 const dynamoDB = new AWS.DynamoDB.DocumentClient()
 

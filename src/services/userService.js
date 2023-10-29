@@ -15,12 +15,13 @@ const authenticateUser = async (email, password) => {
   const user = await getUserAdmin(email)
   if (user.status === constants.user.status.pending) throw errors.inactivatedUser
   if (user.status === constants.user.status.locked) throw errors.lockedUser
+  if (user.status === constants.user.status.deleted) throw errors.inexistentEmail(email)
   if (hashPassword(password) !== user.password) {
-    const wrongAttempts = user.loginData?.wrongAttempts
+    const wrongAttempts = user.loginData?.wrongAttempts + 1
     if (wrongAttempts < constants.user.maxWrongLoginAttempts){
       const loginUpdate = {
         loginData: {
-          wrongAttempts: wrongAttempts + 1,
+          wrongAttempts,
           lastLoginAt: user.loginData.lastLoginAt
         }
       }

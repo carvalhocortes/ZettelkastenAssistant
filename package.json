@@ -29,5 +29,8 @@
     "jsonwebtoken": "^9.0.2",
     "should": "^13.2.3",
     "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "should": "^13.2.3"
   }
 }
