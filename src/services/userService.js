@@ -51,9 +51,8 @@ const createUser = async (body) => {
   const hashedPassword = hashPassword(password)
   body.password = hashedPassword
   const user = await userDb.getByEmail(email)
-  const token = sign({ email }, jwtSecret, { expiresIn: '2h', audience: 'activeUser' })
+  const token = sign({ email }, jwtSecret, { expiresIn: '24h', audience: 'activeUser' })
   if (user) {
-    if (user && user?.status === constants.user.status.pending) return { token }
     if (user && user?.status === constants.user.status.deleted) {
       const newStatus = constants.user.status.pending
       const updateData = assembleUpdate(assembleUser(body), user)
@@ -95,7 +94,7 @@ const activateUser = async (token) => {
 
 const getUnlockToken = async (email) =>{
   const user = await getUserAdmin(email)
-  if (user.status === constants.user.status.pending) return { token: sign({ email }, jwtSecret, { expiresIn: '2h', audience: 'activeUser' }) }
+  if (user.status === constants.user.status.pending) return { token: sign({ email }, jwtSecret, { expiresIn: '24h', audience: 'activeUser' }) }
   if (user.status === constants.user.status.locked) return { token: sign({ email }, jwtSecret, { expiresIn: '2h', audience: 'unlockUser' }) }
   throw errors.userNotLocked(email)
 }
@@ -133,8 +132,7 @@ const checkUserAuthorization = (event) => {
   if (!authorization) throw errors.nonAuthorized
   const [type, token] = authorization.split(' ')
   if (type !== 'Bearer' || !token) throw errors.unsupportedAuthorization
-  const decodedToken = checkTokenAndAudience(token, 'zettelkasten')
-  return decodedToken
+  return checkTokenAndAudience(token, 'zettelkasten')
 }
 
 // PRIVATE FUNCTIONS

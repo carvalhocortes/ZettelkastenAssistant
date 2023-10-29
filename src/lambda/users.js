@@ -18,7 +18,7 @@ const createUser = async (event) => {
     const processedEvent = sanitizeEvent(event)
     const body = userValidator.validateCreateUser(processedEvent)
     const tokenNewUser = await userService.createUser(body)
-    return success(tokenNewUser)
+    return success(tokenNewUser, 201)
   } catch (err) {
     return error(err)
   }

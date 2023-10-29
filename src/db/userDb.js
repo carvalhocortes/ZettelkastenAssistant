@@ -4,9 +4,9 @@ const constants = require('../common/constants')
 const { log } = require('../util/loggerUtil')
 
 const tableName = process.env.USERS_TABLE
-const region = process.env.REGION
+const region = process.env.AWS_REGION
 
-AWS.config.update({ region })
+AWS.config.update({ region, endpoint: process.env.DB_ENDPOINT, dynamoDbCrc32: false })
 
 const dynamoDB = new AWS.DynamoDB.DocumentClient()
 

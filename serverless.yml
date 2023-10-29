@@ -37,7 +37,7 @@ provider:
     SHOW_LOGS: true
     SALT: ${param:salt}
     JWT_SECRET: ${param:jwtSecret}
-    REGION: ${self:provider.region}
+    AWS_REGION: ${self:provider.region}
     FILES_BUCKET: zettelkasten-${opt:stage}
     USERS_TABLE: zettelkasten-users-${opt:stage}
     # MENDELEY_CLIENT_ID: ${ssm:/zettelkasten/MENDELEY_CLIENT_ID}
@@ -66,21 +66,21 @@ functions:
     handler: src/lambda/users.getUser
     events:
       - httpApi:
-          path: /user/{email}
+          path: /user/{username}
           method: get
 
   updateUser:
     handler: src/lambda/users.updateUser
     events:
       - httpApi:
-          path: /user/{email}
+          path: /user/{username}
           method: put
 
   deleteUser:
     handler: src/lambda/users.deleteUser
     events:
       - httpApi:
-          path: /user/{email}
+          path: /user/{username}
           method: delete
 
   activateUser:
@@ -94,7 +94,7 @@ functions:
     handler: src/lambda/users.getUnlockToken
     events:
       - httpApi:
-          path: /user/unlock/{email}
+          path: /user/unlock/{username}
           method: get
 
   unlockUser:
