@@ -8,7 +8,7 @@ const createUserFunc = require('../../src/lambda/users').createUser
 
 const uniqueEmail = () => `${uuid()}@example.com`
 
-const buildUser = (email) => ({
+const buildUser = (email = uniqueEmail()) => ({
   email,
   password: 'GoodPass@123',
   birthDate: '01/12/1984',
@@ -19,7 +19,7 @@ const buildUser = (email) => ({
 
 describe('Create users tests', () => {
   it('Should validate the input', async () => {
-    const user = buildUser(uniqueEmail())
+    const user = buildUser()
     const createUserEvent = buildEvent(user)
     await testRequired(createUserFunc, createUserEvent, 'body', errorsNumber.requiredField)
     await testRequired(createUserFunc, createUserEvent, 'body.email', errorsNumber.requiredField)
@@ -28,7 +28,7 @@ describe('Create users tests', () => {
     await testRequired(createUserFunc, createUserEvent, 'body.country', errorsNumber.requiredField)
   })
   it('Should create a user', async () => {
-    const user = buildUser(uniqueEmail())
+    const user = buildUser()
     user.cantSaveThisField = 'dontSaveThisField'
     const createUserEvent = buildEvent(user)
     const response = await testSuccess(createUserFunc, createUserEvent, 201)
@@ -45,24 +45,23 @@ describe('Create users tests', () => {
     createdUser.should.not.have.property('cantSaveThisField')
   })
   it('Should not create a existent user', async () => {
-    const user = buildUser(uniqueEmail())
+    const user = buildUser()
     const createUserEvent = buildEvent(user)
     await testSuccess(createUserFunc, createUserEvent, 201)
     await testError(createUserFunc, createUserEvent, 400, errorsNumber.userAlreadyExists)
   })
 
   it('Should create a user using a deleted account', async () => {
-    const email = uniqueEmail()
-    const user = buildUser(email)
+    const user = buildUser()
     let createUserEvent = buildEvent(user)
     await testSuccess(createUserFunc, createUserEvent, 201)
-    await userDb.update({ status: 'Deleted' }, email)
+    await userDb.update({ status: 'Deleted' }, user.email)
     delete user.avatar
     createUserEvent = buildEvent(user)
     const response = await testSuccess(createUserFunc, createUserEvent, 201)
     response.should.have.property('token').be.a.String()
     response.token.should.be.ok()
-    const createdUser = await userDb.getByEmail(email)
+    const createdUser = await userDb.getByEmail(user.email)
     createdUser.should.not.have.property('avatar')
   })
 })

@@ -1,17 +1,16 @@
-const { buildEvent, uniqueEmail, buildUser, testSuccess, testRequired, testError } = require('../utils/testUtils')
+const { buildEvent, buildUser, testSuccess, testRequired, testError } = require('../utils/testUtils')
 
 const activateUserFunc = require('../../src/lambda/users').activateUser
 const createUserFunc = require('../../src/lambda/users').createUser
 
 describe('Activate users tests', async () => {
   it('Should validate the input', async () => {
-    const token = 'any Token'
-    const activateUserEvent = buildEvent(undefined, { token })
+    const activateUserEvent = buildEvent(undefined, { token: 'any Token' })
     await testRequired(activateUserFunc, activateUserEvent, 'pathParameters', errorsNumber.requiredField)
     await testRequired(activateUserFunc, activateUserEvent, 'pathParameters.token', errorsNumber.requiredField)
   })
   it('Should activate user', async () => {
-    const user = buildUser(uniqueEmail())
+    const user = buildUser()
     const createUserEvent = buildEvent(user)
     const { token } = await testSuccess(createUserFunc, createUserEvent, 201)
     const activateUserEvent = buildEvent(undefined, { token })

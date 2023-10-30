@@ -40,6 +40,35 @@ const testRequired = async (functionName, event, requiredField, expectedError) =
   await testError(functionName, modifiedEvent, 400, expectedError)
 }
 
+const uniqueEmail = () => `${uuid()}@example.com`
+
+const buildUser = (email = uniqueEmail(), password = 'GoodPass@123') => ({
+  email,
+  password,
+  birthDate: '01/12/1984',
+  city: 'San Francisco',
+  country: 'US',
+  avatar: 'super man'
+})
+
+const createActivatedUser = async(email, password) => {
+    const user = buildUser(email, password)
+    const createUserEvent = buildEvent(user)
+    const { token } = await testSuccess(createUserFunc, createUserEvent, 201)
+    const activateUserEvent = buildEvent(undefined, { token })
+    await testSuccess(activateUserFunc, activateUserEvent, 200)
+    return user
+}
+
+const authenticateUser = async(credentials) => {
+  const authUserEvent = buildEvent(credentials)
+  const { token } = await testSuccess(authUserFunc, authUserEvent, 200)
+  global.token = token
+  return token
+}
+
+// PRIVATE FUNCTIONS
+
 const modifyField = (obj, keys, to) => {
   let currentObj = obj
   for (const key of keys.slice(0, -1)) {
@@ -53,18 +82,7 @@ const modifyField = (obj, keys, to) => {
   if (to === 'delete') delete currentObj[keys[keys.length - 1]]
   obj.body = obj.body ? JSON.stringify(obj.body) : obj.body
   return obj
-};
-
-const uniqueEmail = () => `${uuid()}@example.com`
-
-const buildUser = (email) => ({
-  email,
-  password: 'GoodPass@123',
-  birthDate: '01/12/1984',
-  city: 'San Francisco',
-  country: 'US',
-  avatar: 'super man'
-})
+}
 
 module.exports = {
   buildEvent,
@@ -72,5 +90,7 @@ module.exports = {
   testError,
   testRequired,
   uniqueEmail,
-  buildUser
+  buildUser,
+  createActivatedUser,
+  authenticateUser
 }
