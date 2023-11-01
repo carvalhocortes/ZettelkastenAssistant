@@ -73,7 +73,18 @@ const createUser = async (body) => {
 
 const updateUser = async (email, body) => {
   const user = await getUserAdmin(email)
-  // ver se tem password para atualizar, se sim, verificar se está  dentro do schema e adicionar o lastPasswords
+  if (body.password) {
+    if (!isValidPassword(body.password)) throw errors.invalidPasswordSchema
+    const hashedPassword = hashPassword(body.password)
+    const lastPassword = user.password
+    const lastPasswords = user.lastPasswords ? { ...user.lastPasswords, lastPassword } : [lastPassword]
+    if (lastPasswords?.includes(hashedPassword)) throw errors.passwordAlreadyUsed
+    body = {
+      ...body,
+      password: hashPassword,
+      lastPasswords
+    }
+  }
   const updateData = assembleUpdate(body, user)
   const updatedUser = await userDb.update(updateData, email)
   return assembleUserResponse(updatedUser)
