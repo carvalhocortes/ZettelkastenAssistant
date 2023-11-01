@@ -26,9 +26,10 @@ const validateUpdateUser = (event) => {
   if (!event.pathParameters) throw errors.requiredField('pathParameters')
   isRequired(event.pathParameters.email, 'email')
   if (!event.body) throw errors.requiredField('body')
-  if (event.body.email) throw errors.invalidUpdateField('email')
-  if (event.body.password) throw errors.invalidUpdateField('password')
-  if (event.body.status) throw errors.invalidUpdateField('status')
+  const body = event.body
+  if (body.email) throw errors.invalidUpdateField('email')
+  if (body.status) throw errors.invalidUpdateField('status')
+  if (Object.keys(body).length < 1) throw errors.requiredField('body')
   return event
 }
 
