@@ -104,10 +104,10 @@ const unlockUser = async (newPassword, token) => {
   const { email } = checkTokenAndAudience(token, 'unlockUser')
   const user = await getUserAdmin(email)
   if (!isValidPassword(newPassword)) throw errors.invalidPasswordSchema
-  const lastPasswords = user.lastPasswords
   const hashedPassword = hashPassword(newPassword)
+  const lastPassword = user.password
+  const lastPasswords = user.lastPasswords ? { ...user.lastPasswords, lastPassword } : [lastPassword]
   if (lastPasswords?.includes(hashedPassword)) throw errors.passwordAlreadyUsed
-  lastPasswords ? lastPasswords.push(user.password) : [user.password]
   const newStatus = constants.user.status.active
   const statusLog = user.statusLog
   statusLog.push({
@@ -117,7 +117,7 @@ const unlockUser = async (newPassword, token) => {
   const passwordUpdate = {
     loginData: {
       wrongAttempts: 0,
-      lastLoginAt: user.loginData.lastLoginAt
+      lastLoginAt: user.loginData?.lastLoginAt
     },
     password: hashedPassword,
     lastPasswords,
