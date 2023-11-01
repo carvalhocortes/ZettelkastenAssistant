@@ -1,6 +1,9 @@
 const should = require('should')
 const uuid = require('uuid').v4
 
+const createUserFunc = require('../../src/lambda/users').createUser
+const activateUserFunc = require('../../src/lambda/users').activateUser
+
 const buildEvent = (body, pathParameters, queryStringParameters, token = global.token) => ({
   headers: { Authorization: `Bearer ${token}` },
   body: JSON.stringify(body),
