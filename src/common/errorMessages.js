@@ -72,6 +72,11 @@ module.exports = {
     code: errorCode(12),
     msg: `The password needs to be at least ${constants.user.passwordPolicy.size} characters and ${constants.user.passwordPolicy.especialCharacters} especial character. Look our password policy.`
   },
+  invalidEmailSchema: {
+    httpCode: 400,
+    code: errorCode(14),
+    msg: 'The email address must be valid.'
+  },
   emailNotAvailable: {
     httpCode: 400,
     code: errorCode(13),

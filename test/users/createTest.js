@@ -19,8 +19,7 @@ const buildUser = (email = uniqueEmail()) => ({
 
 describe('Create users tests', () => {
   it('Should validate the input', async () => {
-    const user = buildUser()
-    const createUserEvent = buildEvent(user)
+    const createUserEvent = buildEvent(buildUser())
     await testRequired(createUserFunc, createUserEvent, 'body', errorsNumber.requiredField)
     await testRequired(createUserFunc, createUserEvent, 'body.email', errorsNumber.requiredField)
     await testRequired(createUserFunc, createUserEvent, 'body.password', errorsNumber.requiredField)
@@ -44,9 +43,18 @@ describe('Create users tests', () => {
     createdUser.should.have.property('avatar').which.is.equal(user.avatar)
     createdUser.should.not.have.property('cantSaveThisField')
   })
-  it('Should not create a existent user', async () => {
+  it('Should not create user with invalid email', async () => {
+    const createUserEvent = buildEvent(buildUser(`${uuid()}.@invalidExample.com`))
+    await testError(createUserFunc, createUserEvent, 400, errorsNumber.invalidEmailSchema)
+  })
+  it('Should not create user with invalid password', async () => {
     const user = buildUser()
+    user.password = 'invalidPassword'
     const createUserEvent = buildEvent(user)
+    await testError(createUserFunc, createUserEvent, 400, errorsNumber.invalidPasswordSchema)
+  })
+  it('Should not create a existent user', async () => {
+    const createUserEvent = buildEvent(buildUser())
     await testSuccess(createUserFunc, createUserEvent, 201)
     await testError(createUserFunc, createUserEvent, 400, errorsNumber.emailNotAvailable)
   })
@@ -68,5 +76,7 @@ describe('Create users tests', () => {
 
 const errorsNumber = {
   requiredField: 0,
-  emailNotAvailable: 13
+  invalidPasswordSchema: 12,
+  emailNotAvailable: 13,
+  invalidEmailSchema: 14
 }

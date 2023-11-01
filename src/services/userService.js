@@ -12,7 +12,7 @@ const jwtSecret = process.env.JWT_SECRET
 const hashPassword = password => pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex')
 
 const authenticateUser = async (email, password) => {
-  const user = await getUserAdmin(email)
+  const user = await getUserPrivate(email)
   if (user.status === constants.user.status.pending) throw errors.inactivatedUser
   if (user.status === constants.user.status.locked) throw errors.lockedUser
   if (user.status === constants.user.status.deleted) throw errors.inexistentEmail(email)
@@ -42,12 +42,13 @@ const authenticateUser = async (email, password) => {
 }
 
 const getUser = async (email) => {
-  const user = await getUserAdmin(email)
+  const user = await getUserPrivate(email)
   return assembleUserResponse(user)
 }
 
 const createUser = async (body) => {
   const { email, password } = body
+  if (!isValidEmail(email)) throw errors.invalidEmailSchema
   if (!isValidPassword(password)) throw errors.invalidPasswordSchema
   const hashedPassword = hashPassword(password)
   body.password = hashedPassword
@@ -72,7 +73,7 @@ const createUser = async (body) => {
 }
 
 const updateUser = async (email, body) => {
-  const user = await getUserAdmin(email)
+  const user = await getUserPrivate(email)
   if (body.password) {
     if (!isValidPassword(body.password)) throw errors.invalidPasswordSchema
     const hashedPassword = hashPassword(body.password)
@@ -91,21 +92,21 @@ const updateUser = async (email, body) => {
 }
 
 const deleteUser = async (email) => {
-  const user = await getUserAdmin(email)
+  const user = await getUserPrivate(email)
   const deletedUser = await changeStatus (user, constants.user.status.deleted)
   return assembleUserResponse(deletedUser)
 }
 
 const activateUser = async (token) => {
   const { email } = checkTokenAndAudience(token, 'activeUser')
-  const user = await getUserAdmin(email)
+  const user = await getUserPrivate(email)
   if (user.status !== constants.user.status.pending) throw errors.alreadyActiveUser
   const activatedUser = await changeStatus (user, constants.user.status.active)
   return assembleUserResponse(activatedUser)
 }
 
 const getUnlockToken = async (email) =>{
-  const user = await getUserAdmin(email)
+  const user = await getUserPrivate(email)
   if (user.status === constants.user.status.pending) return { token: sign({ email }, jwtSecret, { expiresIn: '24h', audience: 'activeUser' }) }
   if (user.status === constants.user.status.locked) return { token: sign({ email }, jwtSecret, { expiresIn: '2h', audience: 'unlockUser' }) }
   throw errors.userNotLocked(email)
@@ -113,7 +114,7 @@ const getUnlockToken = async (email) =>{
 
 const unlockUser = async (newPassword, token) => {
   const { email } = checkTokenAndAudience(token, 'unlockUser')
-  const user = await getUserAdmin(email)
+  const user = await getUserPrivate(email)
   if (!isValidPassword(newPassword)) throw errors.invalidPasswordSchema
   const hashedPassword = hashPassword(newPassword)
   const lastPassword = user.password
@@ -149,7 +150,7 @@ const checkUserAuthorization = (event) => {
 
 // PRIVATE FUNCTIONS
 
-const getUserAdmin = async (email) => {
+const getUserPrivate = async (email) => {
   const user = await userDb.getByEmail(email)
   if (!user || user.status === constants.user.status.deleted) throw errors.inexistentEmail(email)
   return user
@@ -164,17 +165,16 @@ const checkTokenAndAudience = (token, audience) => {
 }
 
 const isValidPassword = (password) => {
-  const hasTheCorrectLength = password.length >= constants.user.passwordPolicy.size
-  const numberOfEspecialCharacters = countSpecialCharacters(password)
-  const hasTheCorrectNumberOfEspecialCharacters = numberOfEspecialCharacters >= constants.user.passwordPolicy.especialCharacters
-  if (hasTheCorrectLength && hasTheCorrectNumberOfEspecialCharacters) return true
-  return false
+  const especialCharacters = "!@#$%^&*()_+{}[\]|;:',.<>?"
+  const numberOfRequiredCharacters = constants.user.passwordPolicy.size
+  const expression = `^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[${especialCharacters}])[A-Za-z\d${especialCharacters}]{{${numberOfRequiredCharacters}},}$`
+  const validPasswordRegex = new RegExp(expression, 'g');
+  return validPasswordRegex.test(password)
 }
 
-const countSpecialCharacters = (text) => {
-  const regex = /[!@#$%^&*()_+{}[\]|;:',.<>?]/g
-  const specialChars = text.match(regex)
-  return specialChars ? specialChars.length : 0
+const isValidEmail = (email) => {
+  const regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
+  return regex.test(email)
 }
 
 const assembleUser = (user) => {
