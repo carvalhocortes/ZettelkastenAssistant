@@ -1,7 +1,7 @@
 const { buildEvent, buildUser, testSuccess, testRequired, testError } = require('../utils/testUtils')
 
-const activateUserFunc = require('../../src/lambda/users').activateUser
 const createUserFunc = require('../../src/lambda/users').createUser
+const activateUserFunc = require('../../src/lambda/users').activateUser
 
 describe('Activate users tests', async () => {
   it('Should validate the input', async () => {
