@@ -64,17 +64,17 @@ module.exports = {
   }),
   passwordAlreadyUsed: {
     httpCode: 400,
-    code: errorCode(8),
+    code: errorCode(11),
     msg: 'This password is already used. Try a different password.'
   },
   invalidPasswordSchema: {
     httpCode: 400,
-    code: errorCode(8),
+    code: errorCode(12),
     msg: `The password needs to be at least ${constants.user.passwordPolicy.size} characters and ${constants.user.passwordPolicy.especialCharacters} especial character. Look our password policy.`
   },
   emailNotAvailable: {
     httpCode: 400,
-    code: errorCode(8),
+    code: errorCode(13),
     msg: `This email is not available`
   },
 }
