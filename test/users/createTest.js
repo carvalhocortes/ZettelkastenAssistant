@@ -48,7 +48,7 @@ describe('Create users tests', () => {
     const user = buildUser()
     const createUserEvent = buildEvent(user)
     await testSuccess(createUserFunc, createUserEvent, 201)
-    await testError(createUserFunc, createUserEvent, 400, errorsNumber.userAlreadyExists)
+    await testError(createUserFunc, createUserEvent, 400, errorsNumber.emailNotAvailable)
   })
 
   it('Should create a user using a deleted account', async () => {
@@ -68,5 +68,5 @@ describe('Create users tests', () => {
 
 const errorsNumber = {
   requiredField: 0,
-  userAlreadyExists: 8
+  emailNotAvailable: 13
 }
