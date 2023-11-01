@@ -1,4 +1,3 @@
-
 const assembleUpdateExpression = (updateObject, keysToDelete) => {
   updateObject = sanitizeObject(updateObject)
   keysToDelete = sanitizeObject(keysToDelete)
