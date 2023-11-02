@@ -35,14 +35,14 @@ describe('Unlock users tests', () => {
 
   it('Should unlock user', async () => {
     const user = await createActivatedUser()
-    await userDb.update({ status: 'Locked', loginData: { wrongAttempts: 5 } }, user.email)
+    await userDb.update({ status: 'Locked', loginRecord: { wrongAttempts: 5 } }, user.email)
     const getUnlockTokenEvent = buildEvent(undefined, { email: user.email })
     const { token } = await testSuccess(getUnlockTokenFunc, getUnlockTokenEvent)
     const unlockUserEvent = buildEvent({ token, password: 'aBrandNewPassWord@123' })
     const response = await testSuccess(unlockTokenFunc, unlockUserEvent)
     response.should.have.property('email').which.is.equal(user.email)
     response.should.have.property('status').which.is.equal('Active')
-    response.loginData.wrongAttempts.should.is.equal(0)
+    response.loginRecord.wrongAttempts.should.is.equal(0)
     response.should.not.have.property('password')
   })
 })

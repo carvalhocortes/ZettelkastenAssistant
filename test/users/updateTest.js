@@ -1,4 +1,4 @@
-const { buildEvent, testSuccess, testRequired, testError, createActivatedUser, authenticateUser } = require('../utils/testUtils')
+const { buildEvent, testSuccess, testRequired, testError, createActivatedUser, authenticateUser, buildUser } = require('../utils/testUtils')
 
 const updateUserFunc = require('../../src/lambda/users').updateUser
 
@@ -27,6 +27,17 @@ describe('Update users tests', () => {
     await testError(updateUserFunc, updateUserEvent, 400, errorsNumber.invalidUpdateField)
     updateUserEvent = buildEvent({ permission: 'anyPermission' }, { email: 'any email' })
     await testError(updateUserFunc, updateUserEvent, 400, errorsNumber.invalidUpdateField)
+  })
+  it('Should not create user with invalid birth date', async () => {
+    let birthDate = 'invalid date'
+    let updateUserEvent = buildEvent({ birthDate }, { email: user.email })
+    await testError(updateUserFunc, updateUserEvent, 400, errorsNumber.invalidBirthDateSchema)
+    birthDate = '31/12/2015'
+    updateUserEvent = buildEvent({ birthDate }, { email: user.email })
+    await testError(updateUserFunc, updateUserEvent, 400, errorsNumber.invalidBirthDateSchema)
+    birthDate = '31/12/15'
+    updateUserEvent = buildEvent({ birthDate }, { email: user.email })
+    await testError(updateUserFunc, updateUserEvent, 400, errorsNumber.invalidBirthDateSchema)
   })
   it('Should return a error if sent user dont exist', async() => {
     const updateUserEvent = buildEvent({ test: 'test'}, { email: 'any email' })
@@ -74,5 +85,6 @@ const errorsNumber = {
   inexistentEmail: 5,
   invalidUpdateField: 6,
   passwordAlreadyUsed: 11,
-  invalidPasswordSchema: 12
+  invalidPasswordSchema: 12,
+  invalidBirthDateSchema: 15
 }

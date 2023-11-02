@@ -16,7 +16,7 @@ describe('Get unlock token tests', () => {
   it('Should not generate token to a non locked user', async () => {
     const user = await createActivatedUser()
     const getUnlockTokenEvent = buildEvent(undefined, { email: user.email })
-    await testError(getUnlockTokenFunc, getUnlockTokenEvent, 400, errorsNumber.userNotLocked)
+    await testError(getUnlockTokenFunc, getUnlockTokenEvent, 400, errorsNumber.userDontNeedToken)
   })
   it('Should generate a activation token', async () => {
     const user = await createActivatedUser()
@@ -47,5 +47,5 @@ describe('Get unlock token tests', () => {
 const errorsNumber = {
   requiredField: 0,
   lockedUser: 9,
-  userNotLocked: 10
+  userDontNeedToken: 10
 }

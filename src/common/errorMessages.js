@@ -42,7 +42,7 @@ module.exports = {
     code: errorCode(6),
     msg: `The ${fieldName} field is not updateable`
   }),
-  alreadyActiveUser: {
+  nonActivatableUser: {
     httpCode: 400,
     code: errorCode(7),
     msg: 'User is already active'
@@ -57,7 +57,7 @@ module.exports = {
     code: errorCode(9),
     msg: 'This user was locked, change the password to unlock it'
   },
-  userNotLocked: (email) => ({
+  userDontNeedToken: (email) => ({
     httpCode: 400,
     code: errorCode(10),
     msg: `${email} was not locked.`
@@ -76,6 +76,11 @@ module.exports = {
     httpCode: 400,
     code: errorCode(14),
     msg: 'The email address must be valid.'
+  },
+  invalidBirthDateSchema: {
+    httpCode: 400,
+    code: errorCode(15),
+    msg: 'The data should must be valid.'
   },
   emailNotAvailable: {
     httpCode: 400,

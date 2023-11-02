@@ -50,7 +50,7 @@ const save = async (user) => {
     status: status,
     at: new Date().getTime()
   }]
-  user.loginData = {
+  user.loginRecord = {
     wrongAttempts: 0,
     lastLoginAt: 'never'
   }

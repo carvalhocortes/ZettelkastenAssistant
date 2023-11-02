@@ -44,6 +44,18 @@ describe('Create users tests', () => {
     createdUser.should.have.property('permission').which.is.equal('user')
     createdUser.should.not.have.property('cantSaveThisField')
   })
+  it('Should not create user with invalid birth date', async () => {
+    const user = buildUser()
+    user.birthDate = 'invalid date'
+    let createUserEvent = buildEvent(user)
+    await testError(createUserFunc, createUserEvent, 400, errorsNumber.invalidBirthDateSchema)
+    user.birthDate = '31/12/2015'
+    createUserEvent = buildEvent(user)
+    await testError(createUserFunc, createUserEvent, 400, errorsNumber.invalidBirthDateSchema)
+    user.birthDate = '31/12/15'
+    createUserEvent = buildEvent(user)
+    await testError(createUserFunc, createUserEvent, 400, errorsNumber.invalidBirthDateSchema)
+  })
   it('Should not create user with invalid email', async () => {
     const createUserEvent = buildEvent(buildUser(`${uuid()}.@invalidExample.com`))
     await testError(createUserFunc, createUserEvent, 400, errorsNumber.invalidEmailSchema)
@@ -79,5 +91,6 @@ const errorsNumber = {
   requiredField: 0,
   invalidPasswordSchema: 12,
   emailNotAvailable: 13,
-  invalidEmailSchema: 14
+  invalidEmailSchema: 14,
+  invalidBirthDateSchema: 15
 }
