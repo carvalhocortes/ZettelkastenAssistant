@@ -3,6 +3,7 @@ const uuid = require('uuid').v4
 
 const createUserFunc = require('../../src/lambda/users').createUser
 const activateUserFunc = require('../../src/lambda/users').activateUser
+const authUserFunc = require('../../src/lambda/users').authenticate
 
 const buildEvent = (body, pathParameters, queryStringParameters, token = global.token) => ({
   headers: { Authorization: `Bearer ${token}` },
@@ -45,17 +46,18 @@ const testRequired = async (functionName, event, requiredField, expectedError) =
 
 const uniqueEmail = () => `${uuid()}@example.com`
 
-const buildUser = (email = uniqueEmail(), password = 'GoodPass@123') => ({
+const buildUser = (email = uniqueEmail(), password = 'GoodPass@123', permission) => ({
   email,
   password,
   birthDate: '01/12/1984',
   city: 'San Francisco',
   country: 'US',
-  avatar: 'super man'
+  avatar: 'super man',
+  permission
 })
 
-const createActivatedUser = async(email, password) => {
-    const user = buildUser(email, password)
+const createActivatedUser = async(email, password, permission) => {
+    const user = buildUser(email, password, permission)
     const createUserEvent = buildEvent(user)
     const { token } = await testSuccess(createUserFunc, createUserEvent, 201)
     const activateUserEvent = buildEvent(undefined, { token })
