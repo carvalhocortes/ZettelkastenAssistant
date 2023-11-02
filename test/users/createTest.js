@@ -41,6 +41,7 @@ describe('Create users tests', () => {
     createdUser.should.have.property('city').which.is.equal(user.city)
     createdUser.should.have.property('country').which.is.equal(user.country)
     createdUser.should.have.property('avatar').which.is.equal(user.avatar)
+    createdUser.should.have.property('permission').which.is.equal('user')
     createdUser.should.not.have.property('cantSaveThisField')
   })
   it('Should not create user with invalid email', async () => {

@@ -1,10 +1,11 @@
 'use strict'
 const { pbkdf2Sync } = require('crypto')
-const { sign, verify } = require('jsonwebtoken')
+const { sign } = require('jsonwebtoken')
 
 const userDb = require('../db/userDb')
 const errors = require('../common/errorMessages')
 const constants = require('../common/constants')
+const { checkTokenAndAudience } = require('../util/lambdaUtil')
 
 const salt = process.env.SALT
 const jwtSecret = process.env.JWT_SECRET
@@ -38,7 +39,7 @@ const authenticateUser = async (email, password) => {
     }
   }
   await userDb.update(loginUpdate, email)
-  return { token: sign({ email }, jwtSecret, { expiresIn: '24h', audience: 'zettelkasten'}) }
+  return { token: sign({ email, permission: user.permission }, jwtSecret, { expiresIn: '24h', audience: 'zettelkasten'}) }
 }
 
 const getUser = async (email) => {
@@ -57,7 +58,7 @@ const createUser = async (body) => {
   if (user) {
     if (user && user?.status === constants.user.status.deleted) {
       const newStatus = constants.user.status.pending
-      const updateData = assembleUpdate(assembleUser(body), user)
+      const updateData = assembleUpdate(assembleUser(body, body?.permission), user)
       updateData.status = newStatus
       updateData.statusLog = [...user.statusLog, { status: newStatus, at: new Date().getTime()}]
       updateData.loginData = { wrongAttempts: 0 }
@@ -67,7 +68,7 @@ const createUser = async (body) => {
     }
     throw errors.emailNotAvailable
   }
-  const assembledUser = assembleUser(body)
+  const assembledUser = assembleUser(body, body?.permission)
   await userDb.save(assembledUser)
   return { token }
 }
@@ -140,13 +141,7 @@ const unlockUser = async (newPassword, token) => {
   return assembleUserResponse(updatedUser)
 }
 
-const checkUserAuthorization = (event) => {
-  const { authorization } = event.headers
-  if (!authorization) throw errors.nonAuthorized
-  const [type, token] = authorization.split(' ')
-  if (type !== 'Bearer' || !token) throw errors.unsupportedAuthorization
-  return checkTokenAndAudience(token, 'zettelkasten')
-}
+
 
 // PRIVATE FUNCTIONS
 
@@ -156,13 +151,7 @@ const getUserPrivate = async (email) => {
   return user
 }
 
-const checkTokenAndAudience = (token, audience) => {
-  try {
-    return verify(token, jwtSecret, { audience })
-  } catch (error) {
-    throw errors.invalidToken
-  }
-}
+
 
 const isValidPassword = (password) => {
   const especialCharacters = "!@#$%^&*()_+{}[\]|;:',.<>?"
@@ -177,14 +166,15 @@ const isValidEmail = (email) => {
   return regex.test(email)
 }
 
-const assembleUser = (user) => {
+const assembleUser = (user, permission = constants.user.permissions.user) => {
   return {
     email: user.email,
     password: user.password,
     birthDate: user.birthDate,
     avatar: user.avatar,
     city: user.city,
-    country: user.country
+    country: user.country,
+    permission
     }
 }
 
@@ -235,6 +225,5 @@ module.exports = {
   deleteUser,
   activateUser,
   getUnlockToken,
-  unlockUser,
-  checkUserAuthorization
+  unlockUser
 }

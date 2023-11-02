@@ -5,8 +5,7 @@ module.exports = {
   },
   user: {
     passwordPolicy: {
-      size: 6,
-      especialCharacters: 1
+      size: 6
     },
     maxWrongLoginAttempts: 5,
     status: {
@@ -15,22 +14,10 @@ module.exports = {
       pending: 'Pending',
       deleted: 'Deleted'
     },
-    subscriptions: {
-      pro: 'Premium',
-      regular: 'Regular'
-    },
-    Permissions: {
-      basic: [
-        'changeAccountData',
-        'deleteAccount'
-      ],
-      admin: [
-        'createNewUser',
-        'changeUserData',
-        'deleteUser'
-      ]
+    permissions: {
+      user: 'user',
+      admin: 'administrator'
     }
-
   },
   acceptedDocumentTypes: [
     'pdf',

@@ -1,10 +1,11 @@
-const { success, error, sanitizeEvent } = require('../util/lambdaUtil')
+const { success, error, processEvent } = require('../util/lambdaUtil')
 const userValidator = require('../validator/userValidator')
 const userService = require('../services/userService')
+const constants = require('../common/constants')
 
 const authenticate = async (event) => {
   try {
-    const processedEvent = sanitizeEvent(event)
+    const processedEvent = processEvent(event)
     const { email, password } = userValidator.validateLogin(processedEvent)
     const token = await userService.authenticateUser(email, password)
     return success(token)
@@ -15,7 +16,7 @@ const authenticate = async (event) => {
 
 const createUser = async (event) => {
   try {
-    const processedEvent = sanitizeEvent(event)
+    const processedEvent = processEvent(event)
     const body = userValidator.validateCreateUser(processedEvent)
     const tokenNewUser = await userService.createUser(body)
     return success(tokenNewUser, 201)
@@ -26,8 +27,9 @@ const createUser = async (event) => {
 
 const getUser = async (event) => {
   try {
-    const processedEvent = sanitizeEvent(event)
-    const { email } = userValidator.validateGetUser(processedEvent)
+    const processedEvent = processEvent(event, 'zettelkasten')
+    const isAdmin = processedEvent.session?.permission === constants.user.permissions.admin
+    const email = isAdmin ? (userValidator.validateGetUser(processedEvent)).email : processedEvent.session.email
     const user = await userService.getUser(email)
     return success(user)
   } catch (err) {
@@ -37,9 +39,10 @@ const getUser = async (event) => {
 
 const updateUser = async (event) => {
   try {
-    const processedEvent = sanitizeEvent(event)
-    const { pathParameters, body } = userValidator.validateUpdateUser(processedEvent)
-    const updatedUser = await userService.updateUser(pathParameters.email, body)
+    const processedEvent = processEvent(event, 'zettelkasten')
+    const isAdmin = processedEvent.session?.permission === constants.user.permissions.admin
+    const email = isAdmin ? (userValidator.validateUpdateUser(processedEvent)).pathParameters.email : processedEvent.session.email
+    const updatedUser = await userService.updateUser(email, processedEvent.body)
     return success(updatedUser)
   } catch (err) {
     return error(err)
@@ -48,8 +51,9 @@ const updateUser = async (event) => {
 
 const deleteUser = async (event) => {
   try {
-    const processedEvent = sanitizeEvent(event)
-    const { email } = userValidator.validateDeleteUser(processedEvent)
+    const processedEvent = processEvent(event, 'zettelkasten')
+    const isAdmin = processedEvent.session?.permission === constants.user.permissions.admin
+    const email = isAdmin ? (userValidator.validateDeleteUser(processedEvent)).email : processedEvent.session.email
     const deletedUser = await userService.deleteUser(email)
     return success(deletedUser)
   } catch (err) {
@@ -59,7 +63,7 @@ const deleteUser = async (event) => {
 
 const activateUser = async (event) => {
   try {
-    const processedEvent = sanitizeEvent(event)
+    const processedEvent = processEvent(event)
     const { token } = userValidator.validateActivateUser(processedEvent)
     const unlockedUser = await userService.activateUser(token)
     return success(unlockedUser)
@@ -70,7 +74,7 @@ const activateUser = async (event) => {
 
 const getUnlockToken = async (event) => {
   try {
-    const processedEvent = sanitizeEvent(event)
+    const processedEvent = processEvent(event)
     const { email } = userValidator.validateGetUser(processedEvent)
     const token = await userService.getUnlockToken(email)
     return success(token)
@@ -81,7 +85,7 @@ const getUnlockToken = async (event) => {
 
 const unlockUser = async (event) => {
   try {
-    const processedEvent = sanitizeEvent(event)
+    const processedEvent = processEvent(event)
     const { password, token } = userValidator.validateUnlockUser(processedEvent)
     const unlockedUser = await userService.unlockUser(password, token)
     return success(unlockedUser)
