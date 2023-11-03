@@ -7,9 +7,8 @@ const authenticate = async (event) => {
   try {
     const processedEvent = processEvent(event)
     const { email, password } = userValidator.validateLogin(processedEvent)
-    const {user, token} = await userService.authenticateUser(email, password)
-    const response = assembleUserResponse(user)
-    return success({ response, token})
+    const response = await userService.authenticateUser(email, password)
+    return success({ user: assembleUserResponse(response.user), token: response.token })
   } catch (err) {
     return error(err)
   }
@@ -69,9 +68,8 @@ const activateUser = async (event) => {
   try {
     const processedEvent = processEvent(event)
     const { token } = userValidator.validateActivateUser(processedEvent)
-    const user = await userService.activateUser(token)
-    const response = assembleUserResponse(user)
-    return success(response)
+    const response = await userService.activateUser(token)
+    return success({ user: assembleUserResponse(response.user), token: response.token })
   } catch (err) {
     return error(err)
   }

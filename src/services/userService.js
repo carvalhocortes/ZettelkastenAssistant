@@ -51,7 +51,9 @@ const activateUser = async (token) => {
   const { email } = checkTokenAndAudience(token, 'activeUser')
   const user = await getUser(email)
   if (user.status !== constants.user.status.pending) throw errors.nonActivatableUser
-  return changeStatus (user, constants.user.status.active)
+  const activatedUser = await changeStatus(user, constants.user.status.active)
+  const authToken = sign({ email: user.email , permission: user.permission }, jwtSecret, { expiresIn: '24h', audience: 'zettelkasten'})
+  return { user: activatedUser, token: authToken }
 }
 
 const getUnlockToken = async (email) =>{
@@ -122,11 +124,8 @@ const isValidBirthday = ({ birthday }) => {
 }
 
 const isValidPassword = (password) => {
-  const especialCharacters = "!@#$%^&*()_+{}[\]|;:',.<>?"
-  const numberOfRequiredCharacters = constants.user.passwordPolicy.size
-  const expression = `^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[${especialCharacters}])[A-Za-z\d${especialCharacters}]{{${numberOfRequiredCharacters}},}$`
-  const validPasswordRegex = new RegExp(expression, 'g');
-  return validPasswordRegex.test(password)
+  const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}[\]|;:',.<>?])[A-Za-z\d!@#$%^&*()_+{}[\]|;:',.<>?]{6,}$/
+  return regex.test(password)
 }
 
 const isValidEmail = (email) => {
@@ -193,7 +192,7 @@ const createReturningUser = async (user, body) => {
   updateData.statusLog = [...user.statusLog, assembleStatusLog(newStatus)]
   updateData.loginRecord = { wrongAttempts: 0 }
   await userDb.update(updateData, user.email, user)
-  return { token: sign({ email: user.email }, jwtSecret, { expiresIn: '24h', audience: 'activeUser' }) }
+  return { token: sign({ email: body.email }, jwtSecret, { expiresIn: '24h', audience: 'activeUser' }) }
 }
 
 const validadeCreateUserData = (body) => {

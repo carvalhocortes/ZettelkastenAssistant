@@ -37,9 +37,9 @@ const checkTokenAndAudience = (token, audience) => {
 // PRIVATE FUNCTIONS
 
 const checkUserAuthorization = (event, audience) => {
-  const { Authorization } = event.headers
-  if (!Authorization) throw errors.nonAuthorized
-  const [type, token] = Authorization.split(' ')
+  const { authorization } = event.headers
+  if (!authorization) throw errors.nonAuthorized
+  const [type, token] = authorization.split(' ')
   if (type !== 'Bearer' || !token) throw errors.unsupportedAuthorization
   return checkTokenAndAudience(token, audience)
 }

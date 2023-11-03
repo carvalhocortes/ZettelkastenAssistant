@@ -6,7 +6,7 @@ const activateUserFunc = require('../../src/lambda/users').activateUser
 const authUserFunc = require('../../src/lambda/users').authenticate
 
 const buildEvent = (body, pathParameters, queryStringParameters, token = global.token) => ({
-  headers: { Authorization: `Bearer ${token}` },
+  headers: { authorization: `Bearer ${token}` },
   body: JSON.stringify(body),
   pathParameters,
   queryStringParameters

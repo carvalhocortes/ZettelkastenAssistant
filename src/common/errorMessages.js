@@ -65,12 +65,12 @@ module.exports = {
   passwordAlreadyUsed: {
     httpCode: 400,
     code: errorCode(11),
-    msg: 'This password is already used. Try a different password.'
+    msg: 'This password is already used.'
   },
   invalidPasswordSchema: {
     httpCode: 400,
     code: errorCode(12),
-    msg: `The password needs to be at least ${constants.user.passwordPolicy.size} characters and ${constants.user.passwordPolicy.especialCharacters} especial character. Look our password policy.`
+    msg: `Invalid password.`
   },
   invalidEmailSchema: {
     httpCode: 400,
