@@ -47,9 +47,10 @@ const testRequired = async (functionName, event, requiredField, expectedError) =
 const uniqueEmail = () => `${uuid()}@example.com`
 
 const buildUser = (email = uniqueEmail(), password = 'GoodPass@123', permission) => ({
+  name: 'John Doe',
   email,
   password,
-  birthDate: '01/12/1984',
+  birthday: '01/12/1984',
   city: 'San Francisco',
   country: 'US',
   avatar: 'super man',

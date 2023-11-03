@@ -10,6 +10,7 @@ const validateLogin = event => {
 
 const validateCreateUser = event => {
   if (!event.body) throw errors.requiredField('body')
+  checkRequired(event.body.name, 'name')
   checkRequired(event.body.email, 'email')
   checkRequired(event.body.password, 'password')
   checkRequired(event.body.city, 'city')

@@ -77,7 +77,7 @@ module.exports = {
     code: errorCode(14),
     msg: 'The email address must be valid.'
   },
-  invalidBirthDateSchema: {
+  invalidBirthdaySchema: {
     httpCode: 400,
     code: errorCode(15),
     msg: 'The data should must be valid.'

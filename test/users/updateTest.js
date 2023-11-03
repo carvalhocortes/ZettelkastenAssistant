@@ -1,4 +1,5 @@
 const { buildEvent, testSuccess, testRequired, testError, createActivatedUser, authenticateUser, buildUser } = require('../utils/testUtils')
+const userDb = require('../../src/db/userDb')
 
 const updateUserFunc = require('../../src/lambda/users').updateUser
 
@@ -29,15 +30,15 @@ describe('Update users tests', () => {
     await testError(updateUserFunc, updateUserEvent, 400, errorsNumber.invalidUpdateField)
   })
   it('Should not create user with invalid birth date', async () => {
-    let birthDate = 'invalid date'
-    let updateUserEvent = buildEvent({ birthDate }, { email: user.email })
-    await testError(updateUserFunc, updateUserEvent, 400, errorsNumber.invalidBirthDateSchema)
-    birthDate = '31/12/2015'
-    updateUserEvent = buildEvent({ birthDate }, { email: user.email })
-    await testError(updateUserFunc, updateUserEvent, 400, errorsNumber.invalidBirthDateSchema)
-    birthDate = '31/12/15'
-    updateUserEvent = buildEvent({ birthDate }, { email: user.email })
-    await testError(updateUserFunc, updateUserEvent, 400, errorsNumber.invalidBirthDateSchema)
+    let birthday = 'invalid date'
+    let updateUserEvent = buildEvent({ birthday }, { email: user.email })
+    await testError(updateUserFunc, updateUserEvent, 400, errorsNumber.invalidBirthdaySchema)
+    birthday = '31/12/2015'
+    updateUserEvent = buildEvent({ birthday }, { email: user.email })
+    await testError(updateUserFunc, updateUserEvent, 400, errorsNumber.invalidBirthdaySchema)
+    birthday = '31/12/15'
+    updateUserEvent = buildEvent({ birthday }, { email: user.email })
+    await testError(updateUserFunc, updateUserEvent, 400, errorsNumber.invalidBirthdaySchema)
   })
   it('Should return a error if sent user dont exist', async() => {
     const updateUserEvent = buildEvent({ test: 'test'}, { email: 'any email' })
@@ -54,13 +55,13 @@ describe('Update users tests', () => {
     const response = await testSuccess(updateUserFunc, updateUserEvent)
     response.should.have.property('email').which.is.equal(user.email)
     response.should.have.property('avatar').which.is.equal('newAvatar')
-    response.should.have.property('nonDefault').which.is.equal('nonUsed')
     response.should.have.property('city').which.is.equal('newCity')
-    response.should.have.property('updateHistory')
-    response.updateHistory[0].should.have.property('at')
-    response.updateHistory[0].should.have.property('OldData')
-    response.updateHistory[0].OldData.should.have.property('city').which.is.equal(user.city)
-    response.updateHistory[0].OldData.should.have.property('avatar').which.is.equal(user.avatar)
+    const updatedUser = await userDb.getByEmail(user.email)
+    updatedUser.should.have.property('updateHistory')
+    updatedUser.updateHistory[0].should.have.property('at')
+    updatedUser.updateHistory[0].should.have.property('OldData')
+    updatedUser.updateHistory[0].OldData.should.have.property('city').which.is.equal(user.city)
+    updatedUser.updateHistory[0].OldData.should.have.property('avatar').which.is.equal(user.avatar)
   })
   it('Should update logged user', async () => {
     const user = await createActivatedUser()
@@ -69,13 +70,13 @@ describe('Update users tests', () => {
     const response = await testSuccess(updateUserFunc, updateUserEvent)
     response.should.have.property('email').which.is.equal(user.email)
     response.should.have.property('avatar').which.is.equal('newAvatar')
-    response.should.have.property('nonDefault').which.is.equal('nonUsed')
     response.should.have.property('city').which.is.equal('newCity')
-    response.should.have.property('updateHistory')
-    response.updateHistory[0].should.have.property('at')
-    response.updateHistory[0].should.have.property('OldData')
-    response.updateHistory[0].OldData.should.have.property('city').which.is.equal(user.city)
-    response.updateHistory[0].OldData.should.have.property('avatar').which.is.equal(user.avatar)
+    const updatedUser = await userDb.getByEmail(user.email)
+    updatedUser.should.have.property('updateHistory')
+    updatedUser.updateHistory[0].should.have.property('at')
+    updatedUser.updateHistory[0].should.have.property('OldData')
+    updatedUser.updateHistory[0].OldData.should.have.property('city').which.is.equal(user.city)
+    updatedUser.updateHistory[0].OldData.should.have.property('avatar').which.is.equal(user.avatar)
   })
 })
 
@@ -86,5 +87,5 @@ const errorsNumber = {
   invalidUpdateField: 6,
   passwordAlreadyUsed: 11,
   invalidPasswordSchema: 12,
-  invalidBirthDateSchema: 15
+  invalidBirthdaySchema: 15
 }

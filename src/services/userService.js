@@ -13,15 +13,16 @@ const jwtSecret = process.env.JWT_SECRET
 const hashPassword = password => pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex')
 
 const authenticateUser = async (email, password) => {
-  const user = await getUserPrivate(email)
+  const user = await getUser(email)
   checkUserIsAuthenticatable(user)
   await checkPassword(user, password)
   return doLogin(user)
 }
 
 const getUser = async (email) => {
-  const user = await getUserPrivate(email)
-  return assembleUserResponse(user)
+  const user = await userDb.getByEmail(email)
+  if (!user || user.status === constants.user.status.deleted) throw errors.inexistentEmail(email)
+  return user
 }
 
 const createUser = async (body) => {
@@ -34,30 +35,27 @@ const createUser = async (body) => {
 }
 
 const updateUser = async (email, body) => {
-  const user = await getUserPrivate(email)
+  const user = await getUser(email)
   if (body.password) body = checkAndAddBodyPassword(user, body)
-  if (!isValidBirthDate(body)) throw errors.invalidBirthDateSchema
+  if (!isValidBirthday(body)) throw errors.invalidBirthdaySchema
   const updateData = assembleUpdate(body, user)
-  const updatedUser = await userDb.update(updateData, email)
-  return assembleUserResponse(updatedUser)
+  return userDb.update(updateData, email)
 }
 
 const deleteUser = async (email) => {
-  const user = await getUserPrivate(email)
-  const deletedUser = await changeStatus (user, constants.user.status.deleted)
-  return assembleUserResponse(deletedUser)
+  const user = await getUser(email)
+  return changeStatus (user, constants.user.status.deleted)
 }
 
 const activateUser = async (token) => {
   const { email } = checkTokenAndAudience(token, 'activeUser')
-  const user = await getUserPrivate(email)
+  const user = await getUser(email)
   if (user.status !== constants.user.status.pending) throw errors.nonActivatableUser
-  const activatedUser = await changeStatus (user, constants.user.status.active)
-  return assembleUserResponse(activatedUser)
+  return changeStatus (user, constants.user.status.active)
 }
 
 const getUnlockToken = async (email) =>{
-  const user = await getUserPrivate(email)
+  const user = await getUser(email)
   if (user.status === constants.user.status.pending) return { token: sign({ email }, jwtSecret, { expiresIn: '24h', audience: 'activeUser' }) }
   if (user.status === constants.user.status.locked) return { token: sign({ email }, jwtSecret, { expiresIn: '2h', audience: 'unlockUser' }) }
   throw errors.userDontNeedToken(email)
@@ -65,7 +63,7 @@ const getUnlockToken = async (email) =>{
 
 const unlockUser = async (newPassword, token) => {
   const { email } = checkTokenAndAudience(token, 'unlockUser')
-  const user = await getUserPrivate(email)
+  const user = await getUser(email)
   if (!isValidPassword(newPassword)) throw errors.invalidPasswordSchema
   const { hashedPassword, lastPasswords} = checkPasswordAlreadyUsed(user, newPassword)
   const newStatus = constants.user.status.active
@@ -76,8 +74,7 @@ const unlockUser = async (newPassword, token) => {
     status: newStatus,
     statusLog: [...user.statusLog, assembleStatusLog(newStatus)]
   }
-  const updatedUser = await userDb.update(passwordUpdate, email)
-  return assembleUserResponse(updatedUser)
+  return userDb.update(passwordUpdate, email)
 }
 
 // PRIVATE FUNCTIONS
@@ -106,7 +103,8 @@ const checkPassword = async (user, password) => {
 
 const doLogin = async (user) => {
   await updateLogin(user, 0, new Date().getTime())
-  return { token: sign({ email: user.email , permission: user.permission }, jwtSecret, { expiresIn: '24h', audience: 'zettelkasten'}) }
+  const token = sign({ email: user.email , permission: user.permission }, jwtSecret, { expiresIn: '24h', audience: 'zettelkasten'})
+  return { user, token }
 }
 
 const checkUserIsAuthenticatable = (user) => {
@@ -115,16 +113,10 @@ const checkUserIsAuthenticatable = (user) => {
   if (user.status === constants.user.status.deleted) throw errors.inexistentEmail(email)
 }
 
-const getUserPrivate = async (email) => {
-  const user = await userDb.getByEmail(email)
-  if (!user || user.status === constants.user.status.deleted) throw errors.inexistentEmail(email)
-  return user
-}
-
-const isValidBirthDate = ({ birthDate }) => {
-  if (birthDate) {
+const isValidBirthday = ({ birthday }) => {
+  if (birthday) {
     const regex = /(0[1-9]|1[1,2])(\/|-)(0[1-9]|[12][0-9]|3[01])(\/|-)(19|20)\d{2}/
-    return regex.test(birthDate)
+    return regex.test(birthday)
   }
   return true
 }
@@ -144,9 +136,10 @@ const isValidEmail = (email) => {
 
 const assembleUser = (user, permission = constants.user.permissions.user) => {
   return {
+    name: user.name,
     email: user.email,
     password: user.password,
-    birthDate: user.birthDate,
+    birthday: user.birthday,
     avatar: user.avatar,
     city: user.city,
     country: user.country,
@@ -173,11 +166,6 @@ const assembleChangedFields = (newFields, oldFields) => {
   }
   if (Object.keys(assembledChangedFields).length < 1) return
   return { OldData: assembledChangedFields, at: new Date().getTime()}
-}
-
-const assembleUserResponse = (user) => {
-  delete user.password
-  return user
 }
 
 const changeStatus = (user, newStatus) => {
@@ -211,7 +199,7 @@ const createReturningUser = async (user, body) => {
 const validadeCreateUserData = (body) => {
   if (!isValidEmail(body.email)) throw errors.invalidEmailSchema
   if (!isValidPassword(body.password)) throw errors.invalidPasswordSchema
-  if (!isValidBirthDate(body)) throw errors.invalidBirthDateSchema
+  if (!isValidBirthday(body)) throw errors.invalidBirthdaySchema
 }
 
 const assembleLastPasswords = (user) => {

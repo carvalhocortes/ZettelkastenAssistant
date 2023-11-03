@@ -42,8 +42,9 @@ describe('Unlock users tests', () => {
     const response = await testSuccess(unlockTokenFunc, unlockUserEvent)
     response.should.have.property('email').which.is.equal(user.email)
     response.should.have.property('status').which.is.equal('Active')
-    response.loginRecord.wrongAttempts.should.is.equal(0)
     response.should.not.have.property('password')
+    const updatedUser = await userDb.getByEmail(user.email)
+    updatedUser.loginRecord.wrongAttempts.should.is.equal(0)
   })
 })
 

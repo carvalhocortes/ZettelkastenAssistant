@@ -7,8 +7,9 @@ const authenticate = async (event) => {
   try {
     const processedEvent = processEvent(event)
     const { email, password } = userValidator.validateLogin(processedEvent)
-    const token = await userService.authenticateUser(email, password)
-    return success(token)
+    const {user, token} = await userService.authenticateUser(email, password)
+    const response = assembleUserResponse(user)
+    return success({ response, token})
   } catch (err) {
     return error(err)
   }
@@ -31,7 +32,8 @@ const getUser = async (event) => {
     const isAdmin = processedEvent.session?.permission === constants.user.permissions.admin
     const email = isAdmin ? (userValidator.validateGetUser(processedEvent)).email : processedEvent.session.email
     const user = await userService.getUser(email)
-    return success(user)
+    const response = assembleUserResponse(user)
+    return success(response)
   } catch (err) {
     return error(err)
   }
@@ -42,8 +44,9 @@ const updateUser = async (event) => {
     const processedEvent = processEvent(event, 'zettelkasten')
     const isAdmin = processedEvent.session?.permission === constants.user.permissions.admin
     const email = isAdmin ? (userValidator.validateUpdateUser(processedEvent)).pathParameters.email : processedEvent.session.email
-    const updatedUser = await userService.updateUser(email, processedEvent.body)
-    return success(updatedUser)
+    const user = await userService.updateUser(email, processedEvent.body)
+    const response = assembleUserResponse(user)
+    return success(response)
   } catch (err) {
     return error(err)
   }
@@ -54,8 +57,9 @@ const deleteUser = async (event) => {
     const processedEvent = processEvent(event, 'zettelkasten')
     const isAdmin = processedEvent.session?.permission === constants.user.permissions.admin
     const email = isAdmin ? (userValidator.validateDeleteUser(processedEvent)).email : processedEvent.session.email
-    const deletedUser = await userService.deleteUser(email)
-    return success(deletedUser)
+    const user = await userService.deleteUser(email)
+    const response = assembleUserResponse(user)
+    return success(response)
   } catch (err) {
     return error(err)
   }
@@ -65,8 +69,9 @@ const activateUser = async (event) => {
   try {
     const processedEvent = processEvent(event)
     const { token } = userValidator.validateActivateUser(processedEvent)
-    const unlockedUser = await userService.activateUser(token)
-    return success(unlockedUser)
+    const user = await userService.activateUser(token)
+    const response = assembleUserResponse(user)
+    return success(response)
   } catch (err) {
     return error(err)
   }
@@ -87,13 +92,25 @@ const unlockUser = async (event) => {
   try {
     const processedEvent = processEvent(event)
     const { password, token } = userValidator.validateUnlockUser(processedEvent)
-    const unlockedUser = await userService.unlockUser(password, token)
-    return success(unlockedUser)
+    const user = await userService.unlockUser(password, token)
+    const response = assembleUserResponse(user)
+    return success(response)
   } catch (err) {
     return error(err)
   }
 }
 
+// PRIVATE FUNCTIONS
+
+const assembleUserResponse = user => ({
+  name: user.name,
+  email: user.email,
+  birthday: user.birthday,
+  city: user.city,
+  country: user.country,
+  avatar: user.avatar,
+  status: user.status
+})
 
 module.exports = {
   authenticate,
