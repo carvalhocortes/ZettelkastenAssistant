@@ -104,3 +104,14 @@ functions:
           path: /user/unlock
           method: put
 
+  createPreSignedUrl:
+    handler: src/lambda/files.createPreSignedUrl
+    events:
+      - httpApi:
+          path: /files/presignedUrl
+          method: post
+
+  # handleFileUploaded:
+  #   handler: src/lambda/files.handleFileUploaded
+  #   events:
+  #     - Bu

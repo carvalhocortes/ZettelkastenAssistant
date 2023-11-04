@@ -24,6 +24,6 @@ describe('Activate users tests', async () => {
 })
 
 const errorsNumber = {
-  requiredField: 0,
-  invalidToken: 4
+  requiredField: 1001,
+  invalidToken: 1002
 }

@@ -81,11 +81,11 @@ describe('Update users tests', () => {
 })
 
 const errorsNumber = {
-  requiredField: 0,
-  invalidToken: 4,
-  inexistentEmail: 5,
-  invalidUpdateField: 6,
-  passwordAlreadyUsed: 11,
-  invalidPasswordSchema: 12,
-  invalidBirthdaySchema: 15
+  requiredField: 1001,
+  invalidToken: 1002,
+  inexistentEmail: 2003,
+  invalidUpdateField: 1004,
+  passwordAlreadyUsed: 2008,
+  invalidPasswordSchema: 2009,
+  invalidBirthdaySchema: 2011
 }

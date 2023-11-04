@@ -104,9 +104,9 @@ describe('Authenticate users tests', () => {
 })
 
 const errorsNumber = {
-  requiredField: 0,
-  invalidPassword: 1,
-  inexistentEmail: 5,
-  inactivatedUser: 8,
-  lockedUser: 9,
+  requiredField: 1001,
+  invalidPassword: 2001,
+  inexistentEmail: 2003,
+  inactivatedUser: 2005,
+  lockedUser: 2006,
 }

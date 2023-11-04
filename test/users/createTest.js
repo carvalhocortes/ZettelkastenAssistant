@@ -91,9 +91,9 @@ describe('Create users tests', () => {
 })
 
 const errorsNumber = {
-  requiredField: 0,
-  invalidPasswordSchema: 12,
-  emailNotAvailable: 13,
-  invalidEmailSchema: 14,
-  invalidBirthdaySchema: 15
+  requiredField: 1001,
+  invalidPasswordSchema: 2009,
+  emailNotAvailable: 2012,
+  invalidEmailSchema: 2010,
+  invalidBirthdaySchema: 2011
 }

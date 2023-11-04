@@ -45,7 +45,7 @@ describe('Get unlock token tests', () => {
 })
 
 const errorsNumber = {
-  requiredField: 0,
-  lockedUser: 9,
-  userDontNeedToken: 10
+  requiredField: 1001,
+  lockedUser: 2006,
+  userDontNeedToken: 2007
 }

@@ -1,4 +1,4 @@
-const errors = require ('../common/errorMessages')
+const errors = require("../common/commonErrors")
 const { checkRequired } = require('../util/validatorUtil')
 
 const validateLogin = event => {

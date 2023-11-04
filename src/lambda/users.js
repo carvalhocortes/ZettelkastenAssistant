@@ -1,3 +1,5 @@
+'use strict'
+
 const { success, error, processEvent } = require('../util/lambdaUtil')
 const userValidator = require('../validator/userValidator')
 const userService = require('../services/userService')

@@ -3,7 +3,7 @@ const { pbkdf2Sync } = require('crypto')
 const { sign } = require('jsonwebtoken')
 
 const userDb = require('../db/userDb')
-const errors = require('../common/errorMessages')
+const errors = require('../common/userErrors')
 const constants = require('../common/constants')
 const { checkTokenAndAudience } = require('../util/lambdaUtil')
 

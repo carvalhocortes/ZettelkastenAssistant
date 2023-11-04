@@ -42,7 +42,7 @@ describe('Get users tests', () => {
 })
 
 const errorsNumber = {
-  requiredField: 0,
-  invalidToken: 4,
-  inexistentEmail: 5
+  requiredField: 1001,
+  invalidToken: 1002,
+  inexistentEmail: 2003
 }

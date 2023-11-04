@@ -1,6 +1,6 @@
 const { log } = require('./loggerUtil')
 const { verify } = require('jsonwebtoken')
-const errors = require('../common/errorMessages')
+const errors = require('../common/commonErrors')
 
 const jwtSecret = process.env.JWT_SECRET
 

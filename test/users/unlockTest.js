@@ -49,8 +49,8 @@ describe('Unlock users tests', () => {
 })
 
 const errorsNumber = {
-  requiredField: 0,
-  invalidToken: 4,
-  passwordAlreadyUsed: 11,
-  invalidPasswordSchema: 12
+  requiredField: 1001,
+  invalidToken: 1002,
+  passwordAlreadyUsed: 2008,
+  invalidPasswordSchema: 2009
 }
