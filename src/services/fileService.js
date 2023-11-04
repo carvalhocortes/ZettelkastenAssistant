@@ -1,28 +1,24 @@
-const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
-const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
+'use strict'
 
-const expirationTime = 60 // seconds
+const aws = require('aws-sdk')
+const s3 = new aws.S3()
 
-const bucketName = process.env.FILES_BUCKET
-const accessKeyId = process.env.ACCESS_KEY_ID
-const secretAccessKey = process.env.SECRET_ACCESS_KEY
-const region = process.env.REGION
+const { defaultSignedUrlExpirationInSeconds } = require('../common/constants')
 
-const generatePreSignedUrl = async (fileKey) => {
-  const s3Client = new S3Client({
-    credentials: {
-      accessKeyId,
-      secretAccessKey
-    },
-    region
-  })
-  const command = new PutObjectCommand({
+const downloadFile = (bucketName, fileKey) =>
+  s3.getObject({ Bucket: bucketName, Key: fileKey }).promise()
+    .then(res => res.Body.toString('utf-8'))
+
+const createPreSignedUrl = (fileKey, bucketName, user) => {
+  const params = {
     Bucket: bucketName,
-    Key: fileKey
-  })
-  return getSignedUrl(s3Client, command, { expiresIn: expirationTime })
+    Key: `${user}/${fileKey}`,
+    Expires: defaultSignedUrlExpirationInSeconds
+  }
+  return s3.getSignedUrlPromise('getObject', params)
 }
 
 module.exports = {
-  generatePreSignedUrl
+  downloadFile,
+  createPreSignedUrl
 }
