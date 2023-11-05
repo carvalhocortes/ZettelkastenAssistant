@@ -5,99 +5,77 @@ const userValidator = require('../validator/userValidator')
 const userService = require('../services/userService')
 const constants = require('../common/constants')
 
-const authenticate = async (event) => {
-  try {
-    const processedEvent = processEvent(event)
-    const { email, password } = userValidator.validateLogin(processedEvent)
-    const response = await userService.authenticateUser(email, password)
-    return success({ user: assembleUserResponse(response.user), token: response.token })
-  } catch (err) {
-    return error(err)
-  }
+const authenticate = async (event, _context, callback) => {
+  return processEvent(event)
+    .then(event => userValidator.validateLogin(event))
+    .then(body => userService.authenticateUser(body))
+    .then(response => success({ user: assembleUserResponse(response.user), token: response.token }))
+    .catch(err => error(err))
 }
 
-const createUser = async (event) => {
-  try {
-    const processedEvent = processEvent(event)
-    const body = userValidator.validateCreateUser(processedEvent)
-    const tokenNewUser = await userService.createUser(body)
-    return success(tokenNewUser, 201)
-  } catch (err) {
-    return error(err)
-  }
+const createUser = async (event, _context, callback) => {
+  return processEvent(event)
+    .then(event => userValidator.validateCreateUser(event))
+    .then(body => userService.createUser(body))
+    .then(tokenNewUser => success(tokenNewUser, 201))
+    .catch(err => error(err))
 }
 
 const getUser = async (event) => {
-  try {
-    const processedEvent = processEvent(event, 'zettelkasten')
-    const isAdmin = processedEvent.session?.permission === constants.user.permissions.admin
-    const email = isAdmin ? (userValidator.validateGetUser(processedEvent)).email : processedEvent.session.email
-    const user = await userService.getUser(email)
-    const response = assembleUserResponse(user)
-    return success(response)
-  } catch (err) {
-    return error(err)
-  }
+  return processEvent(event, 'zettelkasten')
+    .then(async event => {
+      const isAdmin = event.session?.permission === constants.user.permissions.admin
+      return isAdmin ? await userValidator.validateGetUser(event) : event.session.email
+    })
+    .then(email => userService.getUser(email))
+    .then(user => success(assembleUserResponse(user)))
+    .catch(err => error(err))
 }
 
 const updateUser = async (event) => {
-  try {
-    const processedEvent = processEvent(event, 'zettelkasten')
-    const isAdmin = processedEvent.session?.permission === constants.user.permissions.admin
-    const email = isAdmin ? (userValidator.validateUpdateUser(processedEvent)).pathParameters.email : processedEvent.session.email
-    const user = await userService.updateUser(email, processedEvent.body)
-    const response = assembleUserResponse(user)
-    return success(response)
-  } catch (err) {
-    return error(err)
-  }
+  return processEvent(event, 'zettelkasten')
+    .then(async event => {
+      const isAdmin = event.session?.permission === constants.user.permissions.admin
+      return isAdmin ? (await userValidator.validateUpdateUser(event)).pathParameters.email : event.session.email
+    })
+    .then(email => userService.updateUser(email, event.body))
+    .then(user => success(assembleUserResponse(user)))
+    .catch(err => error(err))
 }
 
 const deleteUser = async (event) => {
-  try {
-    const processedEvent = processEvent(event, 'zettelkasten')
-    const isAdmin = processedEvent.session?.permission === constants.user.permissions.admin
-    const email = isAdmin ? (userValidator.validateDeleteUser(processedEvent)).email : processedEvent.session.email
-    const user = await userService.deleteUser(email)
-    const response = assembleUserResponse(user)
-    return success(response)
-  } catch (err) {
-    return error(err)
-  }
+  return processEvent(event, 'zettelkasten')
+    .then(async event => {
+      const isAdmin = event.session?.permission === constants.user.permissions.admin
+      return isAdmin ? (await userValidator.validateDeleteUser(event)).email : event.session.email
+    })
+    .then(email => userService.deleteUser(email))
+    .then(user => success(assembleUserResponse(user)))
+    .catch(err => error(err))
 }
 
 const activateUser = async (event) => {
-  try {
-    const processedEvent = processEvent(event)
-    const { token } = userValidator.validateActivateUser(processedEvent)
-    const response = await userService.activateUser(token)
-    return success({ user: assembleUserResponse(response.user), token: response.token })
-  } catch (err) {
-    return error(err)
-  }
+  return processEvent(event)
+    .then(event => userValidator.validateActivateUser(event))
+    .then(token => userService.activateUser(token))
+    .then(response => success({ user: assembleUserResponse(response.user), token: response.token }))
+    .catch(err => error(err))
 }
 
 const getUnlockToken = async (event) => {
-  try {
-    const processedEvent = processEvent(event)
-    const { email } = userValidator.validateGetUser(processedEvent)
-    const token = await userService.getUnlockToken(email)
-    return success(token)
-  } catch (err) {
-    return error(err)
-  }
+  return processEvent(event)
+    .then(event => userValidator.validateGetUser(event))
+    .then(email => userService.getUnlockToken(email))
+    .then(response => success(response))
+    .catch(err => error(err))
 }
 
 const unlockUser = async (event) => {
-  try {
-    const processedEvent = processEvent(event)
-    const { password, token } = userValidator.validateUnlockUser(processedEvent)
-    const user = await userService.unlockUser(password, token)
-    const response = assembleUserResponse(user)
-    return success(response)
-  } catch (err) {
-    return error(err)
-  }
+  return processEvent(event)
+    .then(event => userValidator.validateUnlockUser(event))
+    .then(body => userService.unlockUser(body.password, body.token))
+    .then(user => success(assembleUserResponse(user)))
+    .catch(err => error(err))
 }
 
 // PRIVATE FUNCTIONS

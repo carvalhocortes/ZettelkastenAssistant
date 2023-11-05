@@ -12,7 +12,7 @@ const jwtSecret = process.env.JWT_SECRET
 
 const hashPassword = password => pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex')
 
-const authenticateUser = async (email, password) => {
+const authenticateUser = async ({ email, password }) => {
   const user = await getUser(email)
   checkUserIsAuthenticatable(user)
   await checkPassword(user, password)

@@ -1,14 +1,14 @@
 const errors = require("../common/commonErrors")
 const { checkRequired } = require('../util/validatorUtil')
 
-const validateLogin = event => {
+const validateLogin = async event => {
   if (!event.body) throw errors.requiredField('body')
   checkRequired(event.body.email, 'email')
   checkRequired(event.body.password, 'password')
   return event.body
 }
 
-const validateCreateUser = event => {
+const validateCreateUser = async event => {
   if (!event.body) throw errors.requiredField('body')
   checkRequired(event.body.name, 'name')
   checkRequired(event.body.email, 'email')
@@ -18,13 +18,13 @@ const validateCreateUser = event => {
   return event.body
 }
 
-const validateGetUser = (event) => {
+const validateGetUser = async event => {
   if (!event.pathParameters) throw errors.requiredField('pathParameters')
   checkRequired(event.pathParameters.email, 'email')
-  return event.pathParameters
+  return event.pathParameters.email
 }
 
-const validateUpdateUser = (event) => {
+const validateUpdateUser = async event => {
   if (!event.pathParameters) throw errors.requiredField('pathParameters')
   checkRequired(event.pathParameters.email, 'email')
   if (!event.body) throw errors.requiredField('body')
@@ -36,19 +36,19 @@ const validateUpdateUser = (event) => {
   return event
 }
 
-const validateDeleteUser = (event) => {
+const validateDeleteUser = async event => {
   if (!event.pathParameters) throw errors.requiredField('pathParameters')
   checkRequired(event.pathParameters.email, 'email')
   return event.pathParameters
 }
 
-const validateActivateUser = (event) => {
+const validateActivateUser = async event => {
   if (!event.pathParameters) throw errors.requiredField('pathParameters')
   checkRequired(event.pathParameters.token, 'token')
-  return event.pathParameters
+  return event.pathParameters.token
 }
 
-const validateUnlockUser = (event) => {
+const validateUnlockUser = async event => {
   if (!event.body) throw errors.requiredField('body')
   checkRequired(event.body.token, 'token')
   checkRequired(event.body.password, 'password')
