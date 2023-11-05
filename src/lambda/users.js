@@ -5,7 +5,7 @@ const userValidator = require('../validator/userValidator')
 const userService = require('../services/userService')
 const constants = require('../common/constants')
 
-const authenticate = async (event, _context, callback) => {
+const authenticate = async (event) => {
   return processEvent(event)
     .then(event => userValidator.validateLogin(event))
     .then(body => userService.authenticateUser(body))
@@ -13,7 +13,7 @@ const authenticate = async (event, _context, callback) => {
     .catch(err => error(err))
 }
 
-const createUser = async (event, _context, callback) => {
+const createUser = async (event) => {
   return processEvent(event)
     .then(event => userValidator.validateCreateUser(event))
     .then(body => userService.createUser(body))

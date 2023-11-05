@@ -10,14 +10,13 @@ const downloadFile = (bucketName, fileName) =>
   s3.getObject({ Bucket: bucketName, Key: fileName }).promise()
     .then(res => res.Body.toString('utf-8'))
 
-const createPreSignedUrl = async ({ body: { fileName, bucketName }, session: { email } }) => {
-  const s3BucketName = getS3BucketName(bucketName)
+const createPreSignedUrl = async ({ body: { fileName, bucketName, command }, session: { email } }) => {
   const params = {
-    Bucket: s3BucketName,
+    Bucket: getS3BucketName(bucketName),
     Key: `${email}/${fileName}`,
     Expires: defaultSignedUrlExpirationInSeconds
   }
-  return { url: await s3.getSignedUrlPromise('putObject', params) }
+  return { url: await s3.getSignedUrlPromise(getS3CommandName(command), params) }
 }
 
 // PRIVATE FUNCTIONS
@@ -29,7 +28,20 @@ const getS3BucketName = (bucketName) => {
     case 'avatar':
       return process.env.USER_AVATAR_BUCKET
     default:
-      throw fileErrors .bucketInexistent
+      throw fileErrors.bucketInexistent
+  }
+}
+
+const getS3CommandName = (command) => {
+  switch (command) {
+    case 'get':
+      return 'getObject'
+    case 'put':
+      return 'putObject'
+    case 'delete':
+      return 'deleteObject'
+    default:
+      throw fileErrors.commandIsNotValid
   }
 }
 

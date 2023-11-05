@@ -2,7 +2,7 @@ const { success, error, processEvent } = require('../util/lambdaUtil')
 const fileValidator = require('../validator/fileValidator')
 const fileService = require('../services/fileService')
 
-const createPreSignedUrl = async (event, _context, callback) => {
+const createPreSignedUrl = async (event) => {
   return processEvent(event, 'zettelkasten')
     .then(event => fileValidator.validateCreatePreSignedUrl(event))
     .then(event => fileService.createPreSignedUrl(event))
