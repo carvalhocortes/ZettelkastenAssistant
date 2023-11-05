@@ -1,14 +1,7 @@
-const AWS = require('aws-sdk')
 const dynamoDbUtil = require('../util/dynamoDbUtil')
 const constants = require('../common/constants')
 
 const tableName = process.env.USERS_TABLE
-const region = process.env.REGION
-
-if (process.env.DB_ENDPOINT?.includes('localhost')) AWS.config.update({ region, endpoint: process.env.DB_ENDPOINT })
-else AWS.config.update({ region })
-
-const dynamoDB = new AWS.DynamoDB.DocumentClient()
 
 const getByEmail = async (email) => {
   return dynamoDbUtil.getByKey({ email }, tableName)
@@ -30,7 +23,7 @@ const save = async (user) => {
 
 const update = async (updateData, email, keysToDelete) => {
   if (updateData.email) delete updateData.email
-return dynamoDbUtil.update(updateData, tableName, { email }, keysToDelete)
+  return dynamoDbUtil.update(updateData, tableName, { email }, keysToDelete)
 }
 
 module.exports = {
