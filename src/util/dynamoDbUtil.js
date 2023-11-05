@@ -1,3 +1,53 @@
+const AWS = require('aws-sdk')
+
+const region = process.env.REGION
+
+if (process.env.DB_ENDPOINT?.includes('localhost')) AWS.config.update({ region, endpoint: process.env.DB_ENDPOINT })
+else AWS.config.update({ region })
+
+const dynamoDB = new AWS.DynamoDB.DocumentClient()
+
+const save = async (data, tableName) => {
+  data.createdAt = new Date().getTime()
+  const params = {
+    TableName: tableName,
+    Item: data
+  }
+  return dynamoDB.put(params).promise().then(() => params.Item)
+}
+
+const update = async (updateData, tableName, key, keysToDelete) => {
+  updateData.updatedAt = new Date().getTime()
+  const { updateExpression, expressionAttributeValues, expressionAttributeNames } = assembleUpdateExpression(updateData, keysToDelete)
+  const params = {
+    TableName: tableName,
+    Key: key,
+    UpdateExpression: updateExpression,
+    ExpressionAttributeNames: expressionAttributeNames,
+    ExpressionAttributeValues: expressionAttributeValues,
+    ReturnValues: 'ALL_NEW'
+  }
+  return dynamoDB.update(params).promise().then(res => res.Attributes)
+}
+
+const getByKey = async (key, tableName) => {
+  const keyName = Object.keys(key)[0]
+  const params = {
+    TableName: tableName,
+    KeyConditionExpression: '#key = :keyValue',
+    ExpressionAttributeNames: {
+      '#key': keyName
+    },
+    ExpressionAttributeValues: {
+      ':keyValue': key[keyName]
+    }
+  }
+  const result = await dynamoDB.query(params).promise()
+  return result.Items[0]
+}
+
+// PRIVATE FUNCTIONS
+
 const assembleUpdateExpression = (updateObject, keysToDelete) => {
   updateObject = sanitizeObject(updateObject)
   keysToDelete = sanitizeObject(keysToDelete)
@@ -45,8 +95,6 @@ const assembleUpdateExpression = (updateObject, keysToDelete) => {
   return { updateExpression, expressionAttributeValues, expressionAttributeNames }
 }
 
-// PRIVATE FUNCTIONS
-
 const sanitizeObject = (updateObject) => {
   for (const key in updateObject) {
     if (updateObject[key] === undefined || updateObject[key] === null) delete updateObject[key]
@@ -55,5 +103,7 @@ const sanitizeObject = (updateObject) => {
 }
 
 module.exports = {
-  assembleUpdateExpression
+  save,
+  update,
+  getByKey
 }
