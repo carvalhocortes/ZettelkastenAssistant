@@ -1,11 +1,14 @@
-const constants = require("../common/constants")
 const commonErrors = require("../common/commonErrors")
-const fileErrors = require("../common/fileErrors")
 
-const validateCreatePreSignedUrl = (event, url) => {
+const { checkRequired } = require('../util/validatorUtil')
+
+const validateCreatePreSignedUrl = async event => {
   if (!event.body) throw commonErrors.requiredField('body')
   checkRequired(event.body.fileName, 'fileName')
   checkRequired(event.body.bucketName, 'bucketName')
-  if (!constants.buckets.includes(bucketName)) throw fileErrors.inexistentBucket
   return event
+}
+
+module.exports = {
+  validateCreatePreSignedUrl
 }

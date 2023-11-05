@@ -2,23 +2,18 @@ const { success, error, processEvent } = require('../util/lambdaUtil')
 const fileValidator = require('../validator/fileValidator')
 const fileService = require('../services/fileService')
 
-const createPreSignedUrl = async (event) => {
-  try {
-    const processedEvent = processEvent(event, 'zettelkasten')
-    const {
-      body: { bucketName, fileName },
-      session: { email }
-    } = fileValidator.validateCreatePreSignedUrl(processedEvent)
-    const url = fileService.createPreSignedUrl(fileName, bucketName, email)
-    return success(url)
-  } catch (err) {
-    return error(err)
-  }
+const createPreSignedUrl = async (event, _context, callback) => {
+  return processEvent(event, 'zettelkasten')
+    .then(event => fileValidator.validateCreatePreSignedUrl(event))
+    .then(event => fileService.createPreSignedUrl(event))
+    .then(response => success(response))
+    .catch(err => error(err))
 }
 
 const handleFileUploaded = async (event) => {
   try {
-    return success(response)
+    const processedEvent = processEvent(event)
+    return success(processedEvent)
   } catch (err) {
     return error(err)
   }

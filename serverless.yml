@@ -38,7 +38,8 @@ provider:
     SALT: ${param:salt}
     JWT_SECRET: ${param:jwtSecret}
     REGION: ${self:provider.region}
-    FILES_BUCKET: zettelkasten-${opt:stage}
+    FILES_BUCKET: zettelkasten-files-${opt:stage}
+    USER_AVATAR_BUCKET: zettelkasten-user-avatar-${opt:stage}
     USERS_TABLE: zettelkasten-users-${opt:stage}
     # MENDELEY_CLIENT_ID: ${ssm:/zettelkasten/MENDELEY_CLIENT_ID}
     # MENDELEY_CLIENT_SECRET: ${ssm:/zettelkasten/MENDELEY_CLIENT_SECRET}
@@ -111,7 +112,10 @@ functions:
           path: /files/presignedUrl
           method: post
 
-  # handleFileUploaded:
-  #   handler: src/lambda/files.handleFileUploaded
-  #   events:
-  #     - Bu
+  handleFileUploaded:
+    handler: src/lambda/files.handleFileUploaded
+    events:
+      - s3:
+          bucket: zettelkasten-files-${opt:stage}
+          event: s3:ObjectCreated:*
+

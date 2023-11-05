@@ -1,4 +1,4 @@
-const errorCode = c => 0 + c
+const errorCode = c => 3000 + c
 
 module.exports = {
   bucketInexistent: {

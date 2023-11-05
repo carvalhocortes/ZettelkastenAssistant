@@ -4,12 +4,12 @@ const errors = require('../common/commonErrors')
 
 const jwtSecret = process.env.JWT_SECRET
 
-const success = (body, status = 200) => {
+const success = async (body, status = 200) => {
   log({ status, body })
   return buildHttp(status, body)
 }
 
-const error = (err) => {
+const error = async (err) => {
   if (isUndefined(err.httpCode && err.code && err.msg)) {
     log({ err })
     err = errors.defaultError
@@ -18,11 +18,9 @@ const error = (err) => {
   return buildHttp(err.httpCode, { code: err.code, msg: err.msg })
 }
 
-const processEvent = (event, audience) => {
-  let session = ''
-  if (audience) session = checkUserAuthorization(event, 'zettelkasten')
+const processEvent = async (event, audience) => {
+  if (audience) event.session = checkUserAuthorization(event, 'zettelkasten')
   if (event.body) event.body = JSON.parse(event.body)
-  event.session = session !== '' ? session : undefined
   return event
 }
 

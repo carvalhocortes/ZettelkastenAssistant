@@ -1,8 +1,4 @@
 module.exports = {
-  buckets: [
-    'files',
-    'avatar'
-  ],
   dateFormats: {
     dateFormat: 'YYYY-MM-DD',
     dateTimeFormat: 'YYYY-MM-DD HH:mm:ss'
