@@ -25,5 +25,11 @@ module.exports = {
     'docx',
     'txt'
   ],
-  defaultSignedUrlExpirationInSeconds: 60 * 60
+  file: {
+    defaultSignedUrlExpirationInSeconds: 60 * 60,
+    status: {
+      pending: 'pending',
+      analyzed: 'analyzed'
+    }
+  }
 }
