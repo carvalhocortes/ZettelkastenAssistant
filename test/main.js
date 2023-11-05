@@ -18,4 +18,5 @@ describe('Zettelkasten Assistant tests', () => {
   require('./users/getUnlockTokenTest')
   require('./users/unlockTest')
   require('./users/deleteTest')
+  require('./files/createPreSignedUrlTest')
 })
