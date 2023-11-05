@@ -3,20 +3,41 @@
 const aws = require('aws-sdk')
 const s3 = new aws.S3()
 
-const { defaultSignedUrlExpirationInSeconds } = require('../common/constants')
+const constants = require('../common/constants')
 const fileErrors = require('../common/fileErrors')
+const docalysisConnector = require('../connector/docalysisConnector')
+const mendeleyConnector = require('../connector/mendeleyConnector')
 
-const downloadFile = (bucketName, fileName) =>
-  s3.getObject({ Bucket: bucketName, Key: fileName }).promise()
-    .then(res => res.Body.toString('utf-8'))
 
-const createPreSignedUrl = async ({ body: { fileName, bucketName, command }, session: { email } }) => {
+// const downloadFile = (bucketName, fileKey) =>
+//   s3.getObject({ Bucket: bucketName, Key: fileKey }).promise()
+//     .then(res => res.Body.toString('utf-8'))
+
+const createPreSignedUrl = async (fileName, bucketName, command, email) => {
   const params = {
     Bucket: getS3BucketName(bucketName),
     Key: `${email}/${fileName}`,
-    Expires: defaultSignedUrlExpirationInSeconds
+    Expires: constants.file.defaultSignedUrlExpirationInSeconds
   }
   return { url: await s3.getSignedUrlPromise(getS3CommandName(command), params) }
+}
+
+const handleReceivedFile = async (event) => {
+  const { bucketName, fileName, user } = parseS3Event(event)
+  const url = createPreSignedUrl(bucketName, fileName, 'get', user)
+  const docalysisResponse = await docalysisConnector.sentFileToDocalysis(fileName, url, user)
+  const mendeleyResponse = await mendeleyConnector.sentFileToMendeley()
+  await sentFileToDocalysis(fileName, url, user)
+  const analysis = {
+    user,
+    fileName,
+    checkStatusAfter,
+    docalysisData: docalysisResponse.file,
+    mendeleyData: mendeleyResponse,
+    status: constants.file.status.pending
+  }
+  await filesDb.saveRequestedAnalysis(analysis, user)
+  return
 }
 
 // PRIVATE FUNCTIONS
@@ -45,7 +66,15 @@ const getS3CommandName = (command) => {
   }
 }
 
+const parseS3Event = (event) => {
+  const s3Event = event.Records[0].s3
+  const bucketName = s3Event.bucket.name
+  const [user, fileName] = decodeURIComponent(eventoS3.object.key.replace(/\+/g, ' ')).split('/')
+  return { bucketName, fileName, user }
+}
+
 module.exports = {
-  downloadFile,
-  createPreSignedUrl
+  // downloadFile,
+  createPreSignedUrl,
+  handleReceivedFile
 }

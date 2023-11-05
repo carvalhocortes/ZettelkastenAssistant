@@ -5,18 +5,16 @@ const fileService = require('../services/fileService')
 const createPreSignedUrl = async (event) => {
   return processEvent(event, 'zettelkasten')
     .then(event => fileValidator.validateCreatePreSignedUrl(event))
-    .then(event => fileService.createPreSignedUrl(event))
+    .then(({ body: { fileName, bucketName, command }, session: { email } }) => fileService.createPreSignedUrl(fileName, bucketName, command, email))
     .then(response => success(response))
     .catch(err => error(err))
 }
 
 const handleFileUploaded = async (event) => {
-  try {
-    const processedEvent = processEvent(event)
-    return success(processedEvent)
-  } catch (err) {
-    return error(err)
-  }
+  return processEvent(event)
+    .then(() => fileService.handleReceivedFile(event))
+    .then(() => success(event))
+    .catch(err => error(err))
 }
 
 module.exports = {
