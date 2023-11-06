@@ -58,8 +58,8 @@ const activateUser = async (token) => {
 
 const getUnlockToken = async (email) =>{
   const user = await getUser(email)
-  if (user.status === constants.user.status.pending) return { token: sign({ email }, jwtSecret, { expiresIn: '24h', audience: 'activeUser' }) }
-  if (user.status === constants.user.status.locked) return { token: sign({ email }, jwtSecret, { expiresIn: '2h', audience: 'unlockUser' }) }
+  if (user.status === constants.user.status.pending) return getToken(email, '24h', 'activeUser')
+  if (user.status === constants.user.status.locked) return getToken(email, '2h', 'unlockUser')
   throw errors.userDontNeedToken(email)
 }
 
@@ -81,10 +81,12 @@ const unlockUser = async (newPassword, token) => {
 
 // PRIVATE FUNCTIONS
 
-const updateLogin = async (user, wrongAttempts, lastLoginAt) => {
-  const loginRecord = assembleLoginRecord(wrongAttempts, lastLoginAt)
-  await userDb.update({ loginRecord }, user.email)
-}
+const getToken = (email, expiresIn, audience) => ({
+  token: sign({ email }, jwtSecret, { expiresIn, audience })
+})
+
+const updateLogin = (user, wrongAttempts, lastLoginAt) =>
+  userDb.update({ loginRecord: assembleLoginRecord(wrongAttempts, lastLoginAt) }, user.email)
 
 const assembleLoginRecord = (wrongAttempts, lastLoginAt) => ({
   wrongAttempts,
@@ -147,7 +149,6 @@ const assembleUser = (user, permission = constants.user.permissions.user) => {
 }
 
 const assembleUpdate = (updateFields, originalFields) => {
-  delete updateFields.email
   const changedData = assembleChangedFields(updateFields, originalFields)
   const updateHistory = changedData ? (originalFields.updateHistory ? [...originalFields.updateHistory, changedData] : [changedData]) : undefined
   return {
@@ -182,7 +183,7 @@ const assembleStatusLog = (newStatus) => ({
 
 const createNewUser = async (body) => {
   await userDb.save(assembleUser(body, body?.permission))
-  return { token: sign({ email: body.email }, jwtSecret, { expiresIn: '24h', audience: 'activeUser' }) }
+  return getToken(body.email, '24h', 'activeUser')
 }
 
 const createReturningUser = async (user, body) => {
@@ -191,8 +192,9 @@ const createReturningUser = async (user, body) => {
   updateData.status = newStatus
   updateData.statusLog = [...user.statusLog, assembleStatusLog(newStatus)]
   updateData.loginRecord = { wrongAttempts: 0 }
-  await userDb.update(updateData, user.email, user)
-  return { token: sign({ email: body.email }, jwtSecret, { expiresIn: '24h', audience: 'activeUser' }) }
+  const keysToDelete = getKeysToDelete(updateData)
+  await userDb.update(updateData, user.email, keysToDelete)
+  return getToken(body.email, '24h', 'activeUser')
 }
 
 const validadeCreateUserData = (body) => {
@@ -223,6 +225,14 @@ const checkPasswordAlreadyUsed = (user, password) => {
   const lastPasswords = assembleLastPasswords(user)
   if (lastPasswords?.includes(hashedPassword)) throw errors.passwordAlreadyUsed
   return { hashedPassword, lastPasswords }
+}
+
+const getKeysToDelete = (newUserData) => {
+  const keysToDelete = []
+  for (const key in newUserData) {
+    if (newUserData[key] === undefined || newUserData[key] === null) keysToDelete.push(key)
+  }
+  return keysToDelete
 }
 
 module.exports = {
