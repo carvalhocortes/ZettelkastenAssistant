@@ -131,3 +131,9 @@ functions:
           bucket: zettelkasten-files-${opt:stage}
           event: s3:ObjectCreated:*
 
+  scheduledFileProcess:
+    handler: src/lambda/scheduledProcess.scheduledProcess
+    reservedConcurrency: 1
+    timeout: 300
+    events:
+      - schedule: cron(0/5 * ? * * *)
