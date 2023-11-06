@@ -4,8 +4,9 @@ process.env.SHOW_LOGS = false
 process.env.SALT = "AnyGodSaltAndABitOfMSG"
 process.env.JWT_SECRET = "AReallyGoodSecretToJWT"
 process.env.REGION = "us-east-2"
-process.env.FILES_BUCKET = `zettelkasten-files-${process.env.STAGE}`
+process.env.FILES_TABLE = `zettelkasten-files-${process.env.STAGE}`
 process.env.USERS_TABLE = `zettelkasten-users-${process.env.STAGE}`
+process.env.FILES_BUCKET = `zettelkasten-files-${process.env.STAGE}`
 
 process.env.DB_ENDPOINT = 'http://localhost:8000'
 
@@ -19,4 +20,5 @@ describe('Zettelkasten Assistant tests', () => {
   require('./users/unlockTest')
   require('./users/deleteTest')
   require('./files/createPreSignedUrlTest')
+  require('./files/handleFileUploadedTest')
 })
