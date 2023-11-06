@@ -3,12 +3,9 @@ frameworkVersion: '3'
 
 params:
   default:
-  dev:
-    salt: SJxV9oNKRtEks8un3W3jUZSkHwrxBOdZ
-    jwtSecret: UkBN0me9JRvODL8Olb9iszmWxuOYt74OJEeTfFtiajbTScOGL6iFcMjepagitemzj4DqbHtKV6JokQpdZg8u96EHRUklWoQV3HjSm2PlQdC8hekOlSUWZPTjcMn8DvHdFwkkG7FC63N9yRnHQwAPNuNXNWZfoXlZZNbwirr2t7LLUV5rw9uE8CBEghVQt1KWH9284t5RxmVBtDpSSOs3rITMj6Sh8L9m2tu0KwGszdH45Scl2rce4RIS9Qr8fYS3
-  prod:
-    # salt: ${ssm:/zettelkasten/salt}
-    # jwtSecret: ${ssm:/zettelkasten/jwtSecret}
+    salt: ${file(env.yml):SALT}
+    jwtSecret: ${file(env.yml):JWT_SECRET}
+    docalysisToken: ${file(env.yml):DOCALYSIS_TOKEN}
 
 provider:
   name: aws
@@ -48,6 +45,7 @@ provider:
     SHOW_LOGS: true
     SALT: ${param:salt}
     JWT_SECRET: ${param:jwtSecret}
+    DOCALYSIS_TOKEN: ${param:docalysisToken}
     REGION: ${self:provider.region}
     FILES_BUCKET: zettelkasten-files-${opt:stage}
     USER_AVATAR_BUCKET: zettelkasten-user-avatar-${opt:stage}
