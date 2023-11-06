@@ -21,4 +21,5 @@ describe('Zettelkasten Assistant tests', () => {
   require('./users/deleteTest')
   require('./files/createPreSignedUrlTest')
   require('./files/handleFileUploadedTest')
+  require('./files/scheduledFileProcessTest')
 })
