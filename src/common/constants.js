@@ -25,7 +25,7 @@ module.exports = {
     'docx',
     'txt'
   ],
-  processAfter: {
+  scheduledProcessAfter: {
     docalysis: 'processDocalysis',
     mendeley: 'processMendeley'
   },

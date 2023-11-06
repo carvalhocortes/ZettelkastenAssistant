@@ -1,6 +1,5 @@
 const fileDb = require('../../src/db/fileDb')
 const {  testSuccess, testError, mockSentFileToDocalysis } = require('../helper/testHelper')
-const uuid = require('uuid').v4
 
 const handleFileUploadedFunc = require('../../src/lambda/files').handleFileUploaded
 
@@ -23,16 +22,15 @@ describe('Handle uploaded file tests', () => {
     // mockar mendeley
     const { id } = await testSuccess(handleFileUploadedFunc, event)
     const fileData = await fileDb.getById(id)
-    fileData.should.have.property('fileName')
-    fileData.should.have.property('user')
+    fileData.should.have.property('fileName').which.is.equal('fileName date.txt')
+    fileData.should.have.property('username').which.is.equal('user@gmail.com')
     fileData.should.have.property('status').which.is.equal('pending')
-    // fileData.should.have.property('mendeleyData')Cert
+    fileData.should.have.property('scheduledProcessAfter')
+    fileData.should.have.property('scheduledProcessFunction').which.is.equal('processDocalysis')
     fileData.should.have.property('docalysisData')
-    fileData.should.have.property('processAfter')
-    fileData.should.have.property('processFunction').which.is.equal('processDocalysis')
-    fileData.docalysisData.should.have.property('id')
-    fileData.docalysisData.should.have.property('processed_state')
-    fileData.should.have.property('docalysisData')
+    fileData.docalysisData.should.have.property('id').which.is.equal('2462456')
+    fileData.docalysisData.should.have.property('processed_state').which.is.equal('unprocessed')
+    // fileData.should.have.property('mendeleyData')
   })
 })
 
@@ -57,7 +55,7 @@ const assembleDocalysisResponse = (success) => {
   if (success) return {
     success,
     file: {
-      id: uuid(),
+      id: '2462456',
       created_at: 1686887578000,
       file_size: 184292,
       file_type: "pdf",
