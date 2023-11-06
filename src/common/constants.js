@@ -1,7 +1,7 @@
 module.exports = {
   dateFormats: {
-    dateFormat: 'YYYY-MM-DD',
-    dateTimeFormat: 'YYYY-MM-DD HH:mm:ss'
+    dateFormat: 'yyyy-MM-dd',
+    dateTimeFormat: 'yyyy-MM-dd HH:mm:ss'
   },
   user: {
     passwordPolicy: {
@@ -25,40 +25,41 @@ module.exports = {
     'docx',
     'txt'
   ],
-  scheduledProcessAfter: {
-    docalysis: 'processDocalysis',
-    mendeley: 'processMendeley'
+  scheduledProcess: {
+    getNewStatus: 'getNewStatus',
+    askDocalysis: 'askDocalysis',
+    updateMendeley: 'updateMendeley'
   },
   file: {
     defaultSignedUrlExpirationInSeconds: 60 * 60,
     status: {
-      pending: 'pending',
+      created: 'pendingAnswer',
+      pendingAnswer: 'pending answer',
+      pendingAnalysis: 'pending analysis',
       analyzed: 'analyzed',
       error: 'error'
     },
-    mendeley: {
-      types: {
-        journal: 'journal',
-        book: 'book',
-        generic: 'generic',
-        book_section: 'book_section',
-        conference_proceedings: 'conference_proceedings',
-        working_paper: 'working_paper',
-        report: 'report',
-        web_page: 'web_page',
-        thesis: 'thesis',
-        magazine_article: 'magazine_article',
-        statute: 'statute',
-        patent: 'patent',
-        newspaper_article: 'newspaper_article',
-        computer_program: 'computer_program',
-        hearing: 'hearing',
-        television_broadcast: 'television_broadcast',
-        encyclopedia_article: 'encyclopedia_article',
-        case: 'case',
-        film: 'film',
-        bill: 'bill'
-      }
+    types: {
+      bill: 'bill',
+      book: 'book',
+      book_section: 'book_section',
+      case: 'case',
+      computer_program: 'computer_program',
+      conference_proceedings: 'conference_proceedings',
+      encyclopedia_article: 'encyclopedia_article',
+      film: 'film',
+      generic: 'generic',
+      hearing: 'hearing',
+      journal: 'journal',
+      magazine_article: 'magazine_article',
+      newspaper_article: 'newspaper_article',
+      patent: 'patent',
+      report: 'report',
+      statute: 'statute',
+      television_broadcast: 'television_broadcast',
+      thesis: 'thesis',
+      web_page: 'web_page',
+      working_paper: 'working_paper'
     }
   }
 }
