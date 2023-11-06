@@ -13,7 +13,7 @@ const createPreSignedUrl = async (event) => {
 const handleFileUploaded = async (event) => {
   return processEvent(event)
     .then(() => fileService.handleReceivedFile(event))
-    .then(() => success(event))
+    .then(response => success(response))
     .catch(err => error(err))
 }
 
