@@ -8,10 +8,11 @@ else AWS.config.update({ region })
 const dynamoDB = new AWS.DynamoDB.DocumentClient()
 
 const save = async (data, tableName) => {
-  data.createdAt = new Date().getTime()
+  const sanitizedData = sanitizeObject(data)
+  sanitizedData.createdAt = new Date().getTime()
   const params = {
     TableName: tableName,
-    Item: data
+    Item: sanitizedData
   }
   return dynamoDB.put(params).promise().then(() => params.Item)
 }
@@ -46,6 +47,42 @@ const getByKey = async (key, tableName) => {
   return result.Items[0]
 }
 
+const scheduledReadyToRun = async (index, sort, tableName) => {
+  const params = {
+    TableName: tableName,
+    IndexName: 'scheduledProcessIndex',
+    KeyConditionExpression:'#indexName = :indexValue AND #sortName <= :sortValue',
+    ExpressionAttributeNames: {
+      '#indexName': 'scheduledProcessName',
+      '#sortName': 'scheduledProcessAfter'
+    },
+    ExpressionAttributeValues: {
+      ':indexValue': index,
+      ':sortValue': sort
+    }
+  }
+  const result = await dynamoDB.query(params).promise()
+  return result.Items
+}
+
+const clearTable = async (tableName) => {
+  const scanParam = {
+    TableName: tableName,
+    Select: 'ALL_ATTRIBUTES'
+  }
+  const allItems = await dynamoDB.scan(scanParam).promise()
+
+  for (const item of allItems.Items) {
+    const deleteParams = {
+      TableName: tableName,
+      Key: {
+        id: item.id
+      }
+    }
+    await dynamoDB.delete(deleteParams).promise()
+  }
+}
+
 // PRIVATE FUNCTIONS
 
 const assembleUpdateExpression = (updateObject, keysToDelete) => {
@@ -65,15 +102,12 @@ const assembleUpdateExpression = (updateObject, keysToDelete) => {
     })
   }
   if (keysToDelete){
-    delete keysToDelete.email
-    delete keysToDelete.createdAt
-    Object.keys(keysToDelete).forEach((key) => {
-      if(!Object.keys(updateObject).includes(key)){
-        expressionAttributeNames[`#${key}`] = key
-        attributesToDelete.push(`#${key}`)
-      }
+    keysToDelete.forEach((key) => {
+      expressionAttributeNames[`#${key}`] = key
+      attributesToDelete.push(`#${key}`)
     })
   }
+
   if (attributesToUpdate.length > 0) {
     updateExpression += 'SET '
     attributesToUpdate.forEach((att, index) => {
@@ -95,15 +129,17 @@ const assembleUpdateExpression = (updateObject, keysToDelete) => {
   return { updateExpression, expressionAttributeValues, expressionAttributeNames }
 }
 
-const sanitizeObject = (updateObject) => {
-  for (const key in updateObject) {
-    if (updateObject[key] === undefined || updateObject[key] === null) delete updateObject[key]
+const sanitizeObject = (object) => {
+  for (const key in object) {
+    if (object[key] === undefined || object[key] === null) delete object[key]
   }
-  return updateObject
+  return object
 }
 
 module.exports = {
   save,
   update,
-  getByKey
+  getByKey,
+  scheduledReadyToRun,
+  clearTable
 }
