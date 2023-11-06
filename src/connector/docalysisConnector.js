@@ -20,8 +20,14 @@ const sentFileToDocalysis = async (fileName, url, token) => {
 // PRIVATE FUNCTIONS
 
 const createApi = ({
-  onFulfilled = ({ data }) => data,
-  onRejected = err => err
+  onFulfilled = ({ data }) => {
+    log({ data })
+    return data
+  },
+  onRejected = err => {
+    log({ err })
+    return err
+  }
 } = {}) => {
   const api = axios.create({
     baseURL: encodeURI(baseUrl),
