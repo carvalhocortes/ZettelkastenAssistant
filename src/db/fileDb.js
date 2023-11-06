@@ -16,8 +16,15 @@ const update = async (updateData, id, keysToDelete) => {
 
 const getById = async (id) => dynamoHelper.getByKey({ id }, tableName)
 
+const findAllWithScheduledProcess = async (scheduledProcessName, scheduledProcessAfter) =>
+  dynamoHelper.scheduledReadyToRun(scheduledProcessName, scheduledProcessAfter, tableName)
+
+const clearTable = async () => dynamoHelper.clearTable(tableName)
+
 module.exports = {
   save,
   getById,
-  update
+  update,
+  findAllWithScheduledProcess,
+  clearTable
 }
