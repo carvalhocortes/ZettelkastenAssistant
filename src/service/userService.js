@@ -5,7 +5,7 @@ const { sign } = require('jsonwebtoken')
 const userDb = require('../db/userDb')
 const errors = require('../common/userErrors')
 const constants = require('../common/constants')
-const { checkTokenAndAudience } = require('../util/lambdaUtil')
+const { checkTokenAndAudience } = require('../helper/lambdaHelper')
 
 const salt = process.env.SALT
 const jwtSecret = process.env.JWT_SECRET

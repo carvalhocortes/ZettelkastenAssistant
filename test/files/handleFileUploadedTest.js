@@ -1,5 +1,5 @@
 const fileDb = require('../../src/db/fileDb')
-const {  testSuccess, testError, mockSentFileToDocalysis } = require('../utils/testUtils')
+const {  testSuccess, testError, mockSentFileToDocalysis } = require('../helper/testHelper')
 const uuid = require('uuid').v4
 
 const handleFileUploadedFunc = require('../../src/lambda/files').handleFileUploaded

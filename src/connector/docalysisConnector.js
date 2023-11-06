@@ -1,7 +1,7 @@
 'use strict'
 
 const axios = require('axios')
-const { log } = require('../util/loggerUtil')
+const { log } = require('../helper/loggerHelper')
 const fileErrors = require('../common/fileErrors')
 
 const baseUrl = 'https://api1.docalysis.com/api/v1'

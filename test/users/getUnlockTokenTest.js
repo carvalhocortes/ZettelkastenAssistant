@@ -1,6 +1,6 @@
 const { verify } = require('jsonwebtoken')
 
-const { buildEvent, testSuccess, testRequired, testError, createActivatedUser } = require('../utils/testUtils')
+const { buildEvent, testSuccess, testRequired, testError, createActivatedUser } = require('../helper/testHelper')
 const userDb = require('../../src/db/userDb')
 
 const getUnlockTokenFunc = require('../../src/lambda/users').getUnlockToken

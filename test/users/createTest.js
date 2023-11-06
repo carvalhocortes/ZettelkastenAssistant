@@ -1,7 +1,7 @@
 
 const uuid = require('uuid').v4
 
-const { buildEvent, testSuccess, testError, testRequired } = require('../utils/testUtils')
+const { buildEvent, testSuccess, testError, testRequired } = require('../helper/testHelper')
 const userDb = require('../../src/db/userDb')
 
 const createUserFunc = require('../../src/lambda/users').createUser

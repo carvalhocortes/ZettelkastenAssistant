@@ -1,10 +1,10 @@
-const dynamoDbUtil = require('../util/dynamoDbUtil')
+const dynamoHelper = require('../helper/dynamoHelper')
 const constants = require('../common/constants')
 
 const tableName = process.env.USERS_TABLE
 
 const getByEmail = async (email) => {
-  return dynamoDbUtil.getByKey({ email }, tableName)
+  return dynamoHelper.getByKey({ email }, tableName)
 }
 
 const save = async (user) => {
@@ -18,12 +18,12 @@ const save = async (user) => {
     wrongAttempts: 0,
     lastLoginAt: 'never'
   }
-  return dynamoDbUtil.save(user, tableName)
+  return dynamoHelper.save(user, tableName)
 }
 
 const update = async (updateData, email, keysToDelete) => {
   if (updateData.email) delete updateData.email
-  return dynamoDbUtil.update(updateData, tableName, { email }, keysToDelete)
+  return dynamoHelper.update(updateData, tableName, { email }, keysToDelete)
 }
 
 module.exports = {

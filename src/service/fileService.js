@@ -6,10 +6,10 @@ const s3 = new aws.S3()
 const constants = require('../common/constants')
 const fileErrors = require('../common/fileErrors')
 const docalysisConnector = require('../connector/docalysisConnector')
-const mendeleyConnector = require('../connector/mendeleyConnector')
+// const mendeleyConnector = require('../connector/mendeleyConnector')
 const filesDb = require('../db/fileDb')
-const { afterMinutes } = require('../util/timeutils')
-const { log } = require('../util/loggerUtil')
+const { afterMinutes } = require('../helper/timeHelper')
+const { log } = require('../helper/loggerHelper')
 
 // const downloadFile = (bucketName, fileKey) =>
 //   s3.getObject({ Bucket: bucketName, Key: fileKey }).promise()

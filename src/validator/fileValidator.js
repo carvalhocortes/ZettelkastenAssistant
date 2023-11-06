@@ -1,6 +1,6 @@
 const commonErrors = require("../common/commonErrors")
 
-const { checkRequired } = require('../util/validatorUtil')
+const { checkRequired } = require('../helper/validatorHelper')
 
 const validateCreatePreSignedUrl = async event => {
   if (!event.body) throw commonErrors.requiredField('body')

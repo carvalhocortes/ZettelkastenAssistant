@@ -1,5 +1,5 @@
 const errors = require("../common/commonErrors")
-const { checkRequired } = require('../util/validatorUtil')
+const { checkRequired } = require('../helper/validatorHelper')
 
 const validateLogin = async event => {
   if (!event.body) throw errors.requiredField('body')

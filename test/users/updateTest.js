@@ -1,4 +1,4 @@
-const { buildEvent, testSuccess, testRequired, testError, createActivatedUser, authenticateUser, buildUser } = require('../utils/testUtils')
+const { buildEvent, testSuccess, testRequired, testError, createActivatedUser, authenticateUser, buildUser } = require('../helper/testHelper')
 const userDb = require('../../src/db/userDb')
 
 const updateUserFunc = require('../../src/lambda/users').updateUser

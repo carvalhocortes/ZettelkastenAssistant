@@ -1,4 +1,4 @@
-const { log } = require('./loggerUtil')
+const { log } = require('./loggerHelper')
 const { verify } = require('jsonwebtoken')
 const errors = require('../common/commonErrors')
 

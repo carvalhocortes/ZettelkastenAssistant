@@ -1,8 +1,8 @@
 'use strict'
 
-const { success, error, processEvent } = require('../util/lambdaUtil')
+const { success, error, processEvent } = require('../helper/lambdaHelper')
 const userValidator = require('../validator/userValidator')
-const userService = require('../services/userService')
+const userService = require('../service/userService')
 const constants = require('../common/constants')
 
 const authenticate = async (event) => {
