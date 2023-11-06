@@ -1,9 +1,12 @@
 const should = require('should')
 const uuid = require('uuid').v4
+const nock = require('nock')
 
 const createUserFunc = require('../../src/lambda/users').createUser
 const activateUserFunc = require('../../src/lambda/users').activateUser
 const authUserFunc = require('../../src/lambda/users').authenticate
+
+const docalysisBaseUrl = 'https://api1.docalysis.com/api/v1'
 
 const buildEvent = (body, pathParameters, queryStringParameters, token = global.token) => ({
   headers: { authorization: `Bearer ${token}` },
@@ -73,6 +76,12 @@ const authenticateUser = async(credentials) => {
   return token
 }
 
+const mockSentFileToDocalysis = (response, statusResponse = 200) => {
+  nock(docalysisBaseUrl)
+    .post('/files/create')
+    .reply(statusResponse, response)
+}
+
 // PRIVATE FUNCTIONS
 
 const modifyField = (obj, keys, to) => {
@@ -98,5 +107,6 @@ module.exports = {
   uniqueEmail,
   buildUser,
   createActivatedUser,
-  authenticateUser
+  authenticateUser,
+  mockSentFileToDocalysis
 }
