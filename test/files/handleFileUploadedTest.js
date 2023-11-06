@@ -15,18 +15,17 @@ describe('Handle uploaded file tests', () => {
   //   mockSentFileToDocalysis(docalysisResponse)
   //   await testError(handleFileUploadedFunc, event, 400, errorsNumber.mendeleyError)
   // })
-  it('Should request analysis and save file', async() => {
+  it('Should save file and request analysis', async() => {
     const event = buildS3Event()
-    const docalysisResponse = assembleDocalysisResponse(true)
-    mockSentFileToDocalysis(docalysisResponse)
+    mockSentFileToDocalysis(assembleDocalysisResponse(true))
     // mockar mendeley
     const { id } = await testSuccess(handleFileUploadedFunc, event)
     const fileData = await fileDb.getById(id)
     fileData.should.have.property('fileName').which.is.equal('fileName date.txt')
-    fileData.should.have.property('username').which.is.equal('user@gmail.com')
-    fileData.should.have.property('status').which.is.equal('pending')
+    fileData.should.have.property('owner').which.is.equal('user@gmail.com')
+    fileData.should.have.property('status').which.is.equal('pending answer')
     fileData.should.have.property('scheduledProcessAfter')
-    fileData.should.have.property('scheduledProcessFunction').which.is.equal('processDocalysis')
+    fileData.should.have.property('scheduledProcessName').which.is.equal('getNewStatus')
     fileData.should.have.property('docalysisData')
     fileData.docalysisData.should.have.property('id').which.is.equal('2462456')
     fileData.docalysisData.should.have.property('processed_state').which.is.equal('unprocessed')
