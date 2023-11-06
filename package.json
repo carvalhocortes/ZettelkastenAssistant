@@ -27,6 +27,7 @@
     "@aws-sdk/s3-request-presigner": "^3.293.0",
     "aws-sdk": "^2.1478.0",
     "axios": "^1.6.0",
+    "date-fns": "^2.30.0",
     "jsonwebtoken": "^9.0.2",
     "nock": "^13.3.8",
     "should": "^13.2.3",
