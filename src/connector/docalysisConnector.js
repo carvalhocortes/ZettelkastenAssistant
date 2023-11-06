@@ -64,5 +64,7 @@ const checkDocalysisResponseSuccess = (response) => {
 }
 
 module.exports = {
-  sentFileToDocalysis
+  sentFileToDocalysis,
+  getFileData,
+  askToFile
 }
