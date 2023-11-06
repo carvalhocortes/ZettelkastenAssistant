@@ -82,6 +82,12 @@ const mockSentFileToDocalysis = (response, statusResponse = 200) => {
     .reply(statusResponse, response)
 }
 
+const mockCheckAndUpdateStatus = (fileId, response, statusResponse = 200) => {
+  nock(docalysisBaseUrl)
+    .get(`/files/${fileId}/info`)
+    .reply(statusResponse, response)
+}
+
 // PRIVATE FUNCTIONS
 
 const modifyField = (obj, keys, to) => {
@@ -108,5 +114,6 @@ module.exports = {
   buildUser,
   createActivatedUser,
   authenticateUser,
-  mockSentFileToDocalysis
+  mockSentFileToDocalysis,
+  mockCheckAndUpdateStatus
 }
