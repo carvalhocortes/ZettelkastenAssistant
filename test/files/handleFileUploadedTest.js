@@ -24,6 +24,7 @@ describe('Handle uploaded file tests', () => {
     fileData.should.have.property('fileName').which.is.equal('fileName date.txt')
     fileData.should.have.property('owner').which.is.equal('user@gmail.com')
     fileData.should.have.property('status').which.is.equal('pending answer')
+    fileData.should.have.property('type').which.is.equal('book')
     fileData.should.have.property('scheduledProcessAfter')
     fileData.should.have.property('scheduledProcessName').which.is.equal('getNewStatus')
     fileData.should.have.property('docalysisData')
