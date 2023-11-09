@@ -30,10 +30,13 @@ module.exports = {
     askDocalysis: 'askDocalysis',
     updateMendeley: 'updateMendeley'
   },
+  docalysis: {
+    answerInJson: 'Using JSON notation, answer the following questions: '
+  },
   file: {
     defaultSignedUrlExpirationInSeconds: 60 * 60,
     status: {
-      created: 'pendingAnswer',
+      created: 'pending answer',
       pendingAnswer: 'pending answer',
       pendingAnalysis: 'pending analysis',
       analyzed: 'analyzed',
