@@ -87,6 +87,16 @@ const mockCheckAndUpdateStatus = (fileId, response, statusResponse = 200) => {
     .get(`/files/${fileId}/info`)
     .reply(statusResponse, response)
 }
+const mockAskDocalysis = (fileId, statusResponse = 200) => {
+  const response = {
+    success: statusResponse >= 300 ? false : true,
+    response: "{\n  \"Identification\": {\n    \"Dissertation Title\": \"Making Doctrinal Work More Rigorous: Lessons from Systematic Reviews\",\n    \"Author\": \"William Baude, Adam S. Chilton, and Anup Malani\",\n    \"Institution\": \"The University of Chicago Law School\",\n    \"Date of Submission\": \"2017\",\n    \"Keywords\": [\"systematic reviews\", \"legal doctrine\", \"methodology\"]\n  },\n  \"Summary\": {\n    \"Research Question\": \"How can legal scholars and judges conduct systematic reviews to support their claims about the state of legal doctrine?\",\n    \"Methodology\": \"The authors propose a four-step process that involves defining the research question, defining and obtaining the sample, explaining any weighting applied to the sample cases, and justifying the manner in which the sample cases are analyzed. They argue that this method can prevent bias and improve the legitimacy of conclusions drawn from reviews.\",\n    \"Main Findings\": \"The authors illustrated the value of their proposed method by applying it to doctrinal claims that have been made in recent legal scholarship. They found that the claims lack systematic support and are often made without a systematic demonstration of supporting evidence.\"\n  },\n  \"Relevant Quotations/Excerpts\": \"Legal scholars, advocates, and judges commonly make positive claims about the state of legal doctrine. For example, a legal scholar might claim that there is a trend in recent federal court decisions to allow a particular pretrial procedure, or a judge might claim that most courts endorse a given legal proposition. These claims, however, are frequently made without a systematic demonstration of supporting evidence. When this occurs, it not only makes it difficult for the reader to evaluate the validity of the claim, but also may impede future legal analysis and allow for either conscious or unconscious bias. (Page 1)\",\n  \"Personal Comments\": null,\n  \"Connections\": null,\n  \"Link/Source\": {\n    \"URL\": \"https://chicagounbound.uchicago.edu/cgi/viewcontent.cgi?article=18520&context=journal_articles\"\n  }\n}"
+  }
+  nock(docalysisBaseUrl)
+    .get(`/files/${fileId}/chat`)
+    .reply(statusResponse, response)
+}
+
 
 // PRIVATE FUNCTIONS
 
@@ -115,5 +125,6 @@ module.exports = {
   createActivatedUser,
   authenticateUser,
   mockSentFileToDocalysis,
-  mockCheckAndUpdateStatus
+  mockCheckAndUpdateStatus,
+  mockAskDocalysis
 }
