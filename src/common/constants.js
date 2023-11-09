@@ -19,7 +19,7 @@ module.exports = {
       admin: 'administrator'
     }
   },
-  acceptedDocumentTypes: [
+  acceptedFilesTypes: [
     'pdf',
     'doc',
     'docx',
