@@ -6,8 +6,11 @@ const fileErrors = require('../common/fileErrors')
 
 const baseUrl = 'https://api1.docalysis.com/api/v1'
 
-const sentFileToDocalysis = async (fileName, url, token) => {
-  const headers = assembleAuthHeader(token)
+const token = process.env.DOCALYSIS_TOKEN
+
+const headers = { Authorization: `Bearer ${token}` }
+
+const sentFileToDocalysis = async (fileName, url) => {
   const file = {
     name: fileName,
     url
@@ -16,14 +19,12 @@ const sentFileToDocalysis = async (fileName, url, token) => {
   return checkDocalysisResponseSuccess(response)
 }
 
-const getFileData = async (fileId, token) => {
-  const headers = assembleAuthHeader(token)
+const getFileData = async (fileId) => {
   const response = await docalysisApi.get(`/files/${fileId}/info`, { headers })
   return checkDocalysisResponseSuccess(response)
 }
 
-const askToFile = async (fileId, data, token) => {
-  const headers = assembleAuthHeader(token)
+const askToFile = async (fileId, data) => {
   const response = await docalysisApi.get(`/files/${fileId}/chat`, { headers, data })
   return checkDocalysisResponseSuccess(response)
 }
@@ -50,10 +51,7 @@ const createApi = ({
 
 const docalysisApi = createApi({ onRejected: null })
 
-const assembleAuthHeader = (token, headers = {}) => ({
-  ...headers,
-  Authorization: `Bearer ${token}`
-})
+
 
 const checkDocalysisResponseSuccess = (response) => {
   if (response?.success !== true) {
