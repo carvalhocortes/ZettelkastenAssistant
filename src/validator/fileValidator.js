@@ -7,6 +7,7 @@ const validateCreatePreSignedUrl = async event => {
   checkRequired(event.body.fileName, 'fileName')
   checkRequired(event.body.bucketName, 'bucketName')
   checkRequired(event.body.command, 'command')
+  if (event.body.command === 'put') checkRequired(event.body.type, 'type')
   return event
 }
 
