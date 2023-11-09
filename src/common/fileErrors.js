@@ -16,9 +16,19 @@ module.exports = {
     code: errorCode(3),
     msg: 'Unknown error on Docalysis'
   },
-  mendeleyError: {
+  fileTypeNotSupported: {
     httpCode: 400,
     code: errorCode(4),
+    msg: 'The file type is not supported'
+  },
+  documentTypeNotSupported: {
+    httpCode: 400,
+    code: errorCode(5),
+    msg: 'The given document type is not supported'
+  },
+  mendeleyError: {
+    httpCode: 400,
+    code: errorCode(6),
     msg: 'Unknown error on Mendeley'
   },
 }
