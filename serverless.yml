@@ -131,7 +131,7 @@ functions:
 
   scheduledFileProcess:
     handler: src/lambda/scheduledProcess.scheduledProcess
-    reservedConcurrency: 1
+    # reservedConcurrency: 1
     timeout: 300
     events:
       - schedule: cron(0/5 * ? * * *)
