@@ -38,7 +38,7 @@ const createApi = ({
   },
   onRejected = err => {
     log({ err })
-    return err
+    throw fileErrors.docalysisError
   }
 } = {}) => {
   const api = axios.create({
@@ -49,7 +49,7 @@ const createApi = ({
   return api
 }
 
-const docalysisApi = createApi({ onRejected: null })
+const docalysisApi = createApi()
 
 
 
