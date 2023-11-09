@@ -45,8 +45,6 @@ const createPreSignedUrl = async ({ fileName, type }, bucketName, command, owner
 const handleReceivedFile = async (event) => {
   const { fileKey, fileName, bucket, owner } = parseS3Event(event)
   const { url } = await createPreSignedUrl({ fileName }, 'files', 'get', owner)
-  // const bucket = 'zettelkasten-files-dev'
-  // const fileKey = 'fernando@zettelkastenassistant.com/default.png'
   const { Metadata } = await s3.getObject({ Bucket: bucket, Key: fileKey}).promise()
   const file = await fileDb.save({ owner, type: Metadata?.type, fileName, status: constants.file.status.created })
   const docalysisResponse = await docalysisConnector.sentFileToDocalysis(fileName, url)
@@ -56,7 +54,7 @@ const handleReceivedFile = async (event) => {
   const fileUpdateFields = {
     docalysisData: docalysisResponse.file,
     scheduledProcessName: constants.scheduledProcess.getNewStatus,
-    scheduledProcessAfter: afterMinutes(5),
+    scheduledProcessAfter: afterMinutes(1),
     status: constants.file.status.pendingAnswer
   }
   return fileDb.update(fileUpdateFields, file.id)
@@ -67,7 +65,6 @@ const handleReceivedFile = async (event) => {
 const handlePartnerError = async (error, fileId, errorLocation) => {
   const fileUpdateFields = {
     status: constants.file.status.error,
-    error,
     errorLocation
   }
   await fileDb.update(fileUpdateFields, fileId)
@@ -112,16 +109,22 @@ const checkAndUpdateDocalysisStatus = async (file) => {
   const fileUpdateFields = {
     docalysisData: docalysisResponse.file,
     scheduledProcessName: constants.scheduledProcess.askDocalysis,
-    scheduledProcessAfter: afterMinutes(5),
+    scheduledProcessAfter: afterMinutes(1),
     status: constants.file.status.pendingAnswer
   }
   return fileDb.update(fileUpdateFields, file.id, ['errorLocation', 'error'])
 }
 
 const askDocalysisStatus = async (file) => {
-  const question = questions[file.type]
-  const data = `${prompt}${question}`
-  const answer = docalysisConnector.askToFile(file.docalysisData.id, data)
+  const docalysisAnswer = await docalysisConnector.askToFile(file.docalysisData.id, `${constants.docalysis.answerInJson}${questions[file.type]}`)
+    .catch (async (error) => handlePartnerError(error, file.id, 'asking Docalysis'))
+  const fileUpdateFields = {
+    docalysisAnswers: JSON.parse(docalysisAnswer.response),
+    scheduledProcessName: constants.scheduledProcess.updateMendeley,
+    scheduledProcessAfter: afterMinutes(1),
+    status: constants.file.status.analyzed
+  }
+  return fileDb.update(fileUpdateFields, file.id, ['errorLocation', 'error'])
 }
 
 module.exports = {
