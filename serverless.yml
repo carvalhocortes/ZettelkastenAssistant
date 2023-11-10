@@ -139,17 +139,16 @@ functions:
     events:
       - schedule: cron(0/5 * ? * * *)
 
-  # mendeleyCallback:
-  #   handler: src/lambda/mendeley.getAuthUrl
-  #   events:
-  #     - httpApi:
-  #         path: /mendeley/oauth/url
-  #         method: get
+  mendeleyGetAuthUrl:
+    handler: src/lambda/mendeley.getAuthUrl
+    events:
+      - httpApi:
+          path: /mendeley/oauth
+          method: get
 
-
-  # mendeleyCallback:
-  #   handler: src/lambda/mendeley.mendeleyCallback
-  #   events:
-  #     - httpApi:
-  #         path: /mendeley/oauth/
-  #         method: get
+  mendeleyCallback:
+    handler: src/lambda/mendeley.mendeleyCallback
+    events:
+      - http:
+          path: /mendeley
+          method: get
