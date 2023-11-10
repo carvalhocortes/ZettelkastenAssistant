@@ -35,7 +35,7 @@ const createPreSignedUrl = async ({ fileName, type }, bucketName, command, owner
     Expires: constants.file.defaultSignedUrlExpirationInSeconds,
   }
   if (type && command === 'put') {
-    if (!Object.values(questions).includes(type)) throw fileErrors.documentTypeNotSupported
+    if (!Object.hasOwn(questions, type)) throw fileErrors.documentTypeNotSupported
     params.Metadata = { type }
   }
 
