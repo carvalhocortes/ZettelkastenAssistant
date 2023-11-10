@@ -6,6 +6,10 @@ params:
     salt: ${file(env.yml):SALT}
     jwtSecret: ${file(env.yml):JWT_SECRET}
     docalysisToken: ${file(env.yml):DOCALYSIS_TOKEN}
+    mendeleyId: ${file(env.yml):MENDELEY_ID}
+    mendeleySecret: ${file(env.yml):MENDELEY_SECRET}
+    mendeleyRedirect: ${file(env.yml):MENDELEY_REDIRECT}
+    mendeleyState: ${file(env.yml):MENDELEY_STATE}
 
 provider:
   name: aws
@@ -51,12 +55,11 @@ provider:
     USER_AVATAR_BUCKET: zettelkasten-user-avatar-${opt:stage}
     USERS_TABLE: zettelkasten-users-${opt:stage}
     FILES_TABLE: zettelkasten-files-${opt:stage}
-    # MENDELEY_CLIENT_ID: ${ssm:/zettelkasten/MENDELEY_CLIENT_ID}
-    # MENDELEY_CLIENT_SECRET: ${ssm:/zettelkasten/MENDELEY_CLIENT_SECRET}
-    # DOCALYSIS_CLIENT_ID: ${ssm:/zettelkasten/DOCALYSIS_CLIENT_ID}
-    # DOCALYSIS_CLIENT_SECRET: ${ssm:/zettelkasten/DOCALYSIS_CLIENT_SECRET}
-    # OBSIDIAN_CLIENT_ID: ${ssm:/zettelkasten/OBSIDIAN_CLIENT_ID}
-    # OBSIDIAN_CLIENT_SECRET: ${ssm:/zettelkasten/OBSIDIAN_CLIENT_SECRET}
+    MENDELEY_ID: ${param:mendeleyId}
+    MENDELEY_SECRET: ${param:mendeleySecret}
+    MENDELEY_REDIRECT: ${param:mendeleyRedirect}
+    MENDELEY_STATE: ${param:mendeleyState}
+    MENDELEY_OAUTH_URL: 'https://api.mendeley.com/oauth/authorize'
 
 functions:
   authenticate:
@@ -135,3 +138,18 @@ functions:
     timeout: 300
     events:
       - schedule: cron(0/5 * ? * * *)
+
+  # mendeleyCallback:
+  #   handler: src/lambda/mendeley.getAuthUrl
+  #   events:
+  #     - httpApi:
+  #         path: /mendeley/oauth/url
+  #         method: get
+
+
+  # mendeleyCallback:
+  #   handler: src/lambda/mendeley.mendeleyCallback
+  #   events:
+  #     - httpApi:
+  #         path: /mendeley/oauth/
+  #         method: get

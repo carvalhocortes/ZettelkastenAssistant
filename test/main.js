@@ -1,9 +1,17 @@
 const should = require('should')
+const awsMock = require( 'aws-sdk-mock' )
+awsMock.mock('S3', 'getObject', { Metadata: { type: 'book' } })
 
 process.env.SHOW_LOGS = false
-process.env.SALT = "AnyGodSaltAndABitOfMSG"
-process.env.JWT_SECRET = "AReallyGoodSecretToJWT"
-process.env.REGION = "us-east-2"
+process.env.REGION = 'us-east-2'
+process.env.SALT = 'AnyGodSaltAndABitOfMSG'
+process.env.JWT_SECRET = 'AReallyGoodSecretToJWT'
+process.env.DOCALYSIS_TOKEN = 'us-east-2'
+process.env.MENDELEY_ID = '123PIN'
+process.env.MENDELEY_SECRET = '456PIN'
+process.env.MENDELEY_REDIRECT = ''
+process.env.MENDELEY_STATE = ''
+process.env.MENDELEY_OAUTH_URL = 'https://api.mendeley.com/oauth/authorize'
 process.env.FILES_TABLE = `zettelkasten-files-${process.env.STAGE}`
 process.env.USERS_TABLE = `zettelkasten-users-${process.env.STAGE}`
 process.env.FILES_BUCKET = `zettelkasten-files-${process.env.STAGE}`
