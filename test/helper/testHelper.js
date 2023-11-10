@@ -7,6 +7,7 @@ const activateUserFunc = require('../../src/lambda/users').activateUser
 const authUserFunc = require('../../src/lambda/users').authenticate
 
 const docalysisBaseUrl = 'https://api1.docalysis.com/api/v1'
+const mendeleyBaseUrl = 'https://api.mendeley.com'
 
 const buildEvent = (body, pathParameters, queryStringParameters, token = global.token) => ({
   headers: { authorization: `Bearer ${token}` },
@@ -82,6 +83,13 @@ const mockSentFileToDocalysis = (response, statusResponse = 200) => {
     .reply(statusResponse, response)
 }
 
+
+const mockCreateMendeleyDocument = (response, statusResponse = 200) => {
+  nock(mendeleyBaseUrl)
+    .post('/documents')
+    .reply(statusResponse, response)
+}
+
 const mockCheckAndUpdateStatus = (fileId, response, statusResponse = 200) => {
   nock(docalysisBaseUrl)
     .get(`/files/${fileId}/info`)
@@ -126,5 +134,6 @@ module.exports = {
   authenticateUser,
   mockSentFileToDocalysis,
   mockCheckAndUpdateStatus,
-  mockAskDocalysis
+  mockAskDocalysis,
+  mockCreateMendeleyDocument
 }
