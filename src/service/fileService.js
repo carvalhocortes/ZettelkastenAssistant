@@ -7,8 +7,9 @@ const constants = require('../common/constants')
 const questions = require('../common/questions')
 const fileErrors = require('../common/fileErrors')
 const docalysisConnector = require('../connector/docalysisConnector')
-// const mendeleyConnector = require('../connector/mendeleyConnector')
+const mendeleyConnector = require('../connector/mendeleyConnector')
 const fileDb = require('../db/fileDb')
+const userDb = require('../db/userDb')
 const { afterMinutes, now, makeMoment } = require('../helper/timeHelper')
 const { generateScheduledProcess } = require('../helper/scheduledProcessHelper')
 
@@ -45,17 +46,22 @@ const createPreSignedUrl = async ({ fileName, type }, bucketName, command, owner
 const handleReceivedFile = async (event) => {
   const { fileKey, fileName, bucket, owner } = parseS3Event(event)
   const { url } = await createPreSignedUrl({ fileName }, 'files', 'get', owner)
-  const { Metadata } = await s3.getObject({ Bucket: bucket, Key: fileKey}).promise()
-  const file = await fileDb.save({ owner, type: Metadata?.type, fileName, status: constants.file.status.created })
+  const s3File = await s3.getObject({ Bucket: bucket, Key: fileKey}).promise()
+  const file = await fileDb.save({ owner, type: s3File.Metadata?.type, fileName, status: constants.file.status.created })
   const docalysisResponse = await docalysisConnector.sentFileToDocalysis(fileName, url)
     .catch (async (error) => handlePartnerError(error, file.id, 'sending file to Docalysis'))
-  // const mendeleyResponse = await mendeleyConnector.sentFileToMendeley()
-  //   .catch (async (error) => handlePartnerError(error, user, fileName, 'mendeley'))
   const fileUpdateFields = {
     docalysisData: docalysisResponse.file,
     scheduledProcessName: constants.scheduledProcess.getNewStatus,
     scheduledProcessAfter: afterMinutes(1),
     status: constants.file.status.pendingAnswer
+  }
+  const user = await userDb.getByEmail(owner)
+  if (user?.config?.useMendeley) {
+    const fileContent = s3File.Body.toString('utf-8')
+    const mendeleyResponse = await mendeleyConnector.createMendeleyDocument(fileName, fileContent, owner)
+      .catch (async (error) => handlePartnerError(error, file.id, 'creating Mendeley document'))
+    fileUpdateFields.mendeleyData = mendeleyResponse
   }
   return fileDb.update(fileUpdateFields, file.id)
 }
@@ -72,27 +78,24 @@ const handlePartnerError = async (error, fileId, errorLocation) => {
 }
 
 const getS3BucketName = (bucketName) => {
-  switch (bucketName) {
-    case 'files':
-      return process.env.FILES_BUCKET
-    case 'avatar':
-      return process.env.USER_AVATAR_BUCKET
-    default:
-      throw fileErrors.bucketInexistent
+  const buckets = {
+    files: process.env.FILES_BUCKET,
+    avatar: process.env.USER_AVATAR_BUCKET
   }
+  const selected = buckets[bucketName]
+  if (!selected) throw fileErrors.bucketInexistent
+  return selected
 }
 
 const getS3CommandName = (command) => {
-  switch (command) {
-    case 'get':
-      return 'getObject'
-    case 'put':
-      return 'putObject'
-    case 'delete':
-      return 'deleteObject'
-    default:
-      throw fileErrors.commandIsNotValid
+  const commands = {
+    get: 'getObject',
+    put: 'putObject',
+    delete: 'deleteObject'
   }
+  const selected = commands[command]
+  if (!selected) throw fileErrors.commandIsNotValid
+  return selected
 }
 
 const parseS3Event = (event) => {
