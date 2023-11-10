@@ -51,8 +51,6 @@ const createApi = ({
 
 const docalysisApi = createApi()
 
-
-
 const checkDocalysisResponseSuccess = (response) => {
   if (response?.success !== true) {
     log({ DocalysisError: response?.error })

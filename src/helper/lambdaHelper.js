@@ -32,8 +32,6 @@ const checkTokenAndAudience = (token, audience) => {
   }
 }
 
-// PRIVATE FUNCTIONS
-
 const checkUserAuthorization = (event, audience) => {
   const { authorization } = event.headers
   if (!authorization) throw errors.nonAuthorized
@@ -41,6 +39,8 @@ const checkUserAuthorization = (event, audience) => {
   if (type !== 'Bearer' || !token) throw errors.unsupportedAuthorization
   return checkTokenAndAudience(token, audience)
 }
+
+// PRIVATE FUNCTIONS
 
 const isUndefined = (value) => typeof value === 'undefined'
 
@@ -62,5 +62,6 @@ module.exports = {
   success,
   error,
   processEvent,
+  checkUserAuthorization,
   checkTokenAndAudience
 }
