@@ -41,7 +41,7 @@ const createMendeleyDocument = async (filename, data, owner) => {
 // PRIVATE FUNCTIONS
 
 const assembleOAuthResponse = (response) => {
-  const validUntil = (response.expires_in * 1000) + timeHelper.now()
+  const validUntil = (response.expires_in * 1000) + now()
   delete response.expires_in
   return {
     accessToken: response.access_token,
