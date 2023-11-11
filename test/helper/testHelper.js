@@ -95,6 +95,14 @@ const mockCheckAndUpdateStatus = (fileId, response, statusResponse = 200) => {
     .get(`/files/${fileId}/info`)
     .reply(statusResponse, response)
 }
+
+const mockExchangeMendeleyCredentials = (response, statusResponse = 200) => {
+  nock(mendeleyBaseUrl)
+    .post('/oauth/token')
+    .reply(statusResponse, response)
+}
+
+
 const mockAskDocalysis = (fileId, statusResponse = 200) => {
   const response = {
     success: statusResponse >= 300 ? false : true,
@@ -135,5 +143,6 @@ module.exports = {
   mockSentFileToDocalysis,
   mockCheckAndUpdateStatus,
   mockAskDocalysis,
-  mockCreateMendeleyDocument
+  mockCreateMendeleyDocument,
+  mockExchangeMendeleyCredentials
 }
