@@ -11,6 +11,14 @@ const validateCreatePreSignedUrl = async event => {
   return event
 }
 
+const validadeUpdateFileData = async event => {
+  if (!event.body) throw commonErrors.requiredField('body')
+  checkRequired(event.body.updateFileData, 'updateFileData')
+  if (!event.body) throw commonErrors.requiredField('body')
+  checkRequired(event.pathParameters.fileId, 'fileId')
+}
+
 module.exports = {
-  validateCreatePreSignedUrl
+  validateCreatePreSignedUrl,
+  validadeUpdateFileData
 }

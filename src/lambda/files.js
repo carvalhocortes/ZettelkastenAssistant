@@ -17,7 +17,16 @@ const handleFileUploaded = async (event) => {
     .catch(err => error(err))
 }
 
+const updateFileData = async (event) => {
+  return processEvent(event, 'zettelkasten')
+    .then(event => fileValidator.validadeUpdateFileData(event))
+    .then(() => fileService.updateFileData(event))
+    .then(response => success(response))
+    .catch(err => error(err))
+}
+
 module.exports = {
   createPreSignedUrl,
-  handleFileUploaded
+  handleFileUploaded,
+  updateFileData
 }

@@ -31,12 +31,22 @@ const exchangeAuthorizationCode = async (code) => {
 const createMendeleyDocument = async (filename, data, owner) => {
   const token = await getValidToken(owner)
   const headers = {
-    'Content-Disposition': `attachment; filename="${filename}"`,
-    'Authorization': `Bearer ${token}`,
+    'Content-Disposition': `attachment; filename="${ filename }"`,
+    'Authorization': `Bearer ${ token }`,
     'Content-Type': 'application/pdf'
   }
   return mendeleyApi.post('/documents', data, { headers })
 }
+
+const updateDocument = async (documentId, data, owner) => {
+  const token = await getValidToken(owner)
+  const headers = {
+    'Authorization': `Bearer ${ token }`,
+    'Content-Type': 'application/vnd.mendeley-document.1+json'
+  }
+  return mendeleyApi.patch(`/documents/${ documentId }`, data, { headers })
+}
+
 
 // PRIVATE FUNCTIONS
 
@@ -92,11 +102,12 @@ const refreshToken = async (user) => {
   }
   const response = await mendeleyApi.post('/oauth/token', body, { headers })
   const updatedToken =  assembleOAuthResponse(response)
-  await userDb.update({ mendeleyTokens: updatedToken }, email)
+  await userDb.update({ mendeleyTokens: updatedToken }, { email: user.email})
   return { token: updatedToken.accessToken }
 }
 
 module.exports = {
   createMendeleyDocument,
-  exchangeAuthorizationCode
+  exchangeAuthorizationCode,
+  updateDocument
 }

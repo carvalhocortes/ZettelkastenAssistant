@@ -32,7 +32,7 @@ const createPreSignedUrl = async ({ fileName, type }, bucketName, command, owner
   if (!constants.acceptedFilesTypes.includes(receivedFileExtension)) throw fileErrors.fileTypeNotSupported
   const params = {
     Bucket: getS3BucketName(bucketName),
-    Key: `${owner}/${fileName}`,
+    Key: `${ owner }/${ fileName }`,
     Expires: constants.file.defaultSignedUrlExpirationInSeconds,
   }
   if (type && command === 'put') {
@@ -64,6 +64,19 @@ const handleReceivedFile = async (event) => {
     fileUpdateFields.mendeleyData = mendeleyResponse
   }
   return fileDb.update(fileUpdateFields, file.id)
+}
+
+const updateFileData = async event => {
+  const owner = event.session.email
+  const { pathParameters: { fileId }, body: { updateFileData} } = event
+  const file = await fileDb.getById(fileId)
+  const mendeleyResponse = await mendeleyConnector.updateDocument(file.mendeleyData.id, updateFileData, owner)
+  const updateData = {
+    data: updateData,
+    mendeleyData: mendeleyResponse,
+    status: constants.file.status.created
+  }
+  return fileDb.update(updateData, { id: fileId })
 }
 
 // PRIVATE FUNCTIONS
@@ -119,20 +132,19 @@ const checkAndUpdateDocalysisStatus = async (file) => {
 }
 
 const askDocalysisStatus = async (file) => {
-  const docalysisAnswer = await docalysisConnector.askToFile(file.docalysisData.id, `${constants.docalysis.answerInJson}${questions[file.type]}`)
+  const docalysisAnswer = await docalysisConnector.askToFile(file.docalysisData.id, `${ constants.docalysis.answerInJson }${ questions[file.type] }`)
     .catch (async (error) => handlePartnerError(error, file.id, 'asking Docalysis'))
   const fileUpdateFields = {
     docalysisAnswers: JSON.parse(docalysisAnswer.response),
-    scheduledProcessName: constants.scheduledProcess.updateMendeley,
-    scheduledProcessAfter: afterMinutes(1),
     status: constants.file.status.analyzed
   }
-  return fileDb.update(fileUpdateFields, file.id, ['errorLocation', 'error'])
+  return fileDb.update(fileUpdateFields, file.id, ['errorLocation', 'error', 'scheduledProcessName', 'scheduledProcessAfter'])
 }
 
 module.exports = {
   // downloadFile,
   createPreSignedUrl,
   handleReceivedFile,
-  scheduledProcess
+  scheduledProcess,
+  updateFileData
 }
