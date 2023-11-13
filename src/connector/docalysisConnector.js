@@ -8,7 +8,7 @@ const baseUrl = 'https://api1.docalysis.com/api/v1'
 
 const token = process.env.DOCALYSIS_TOKEN
 
-const headers = { Authorization: `Bearer ${token}` }
+const headers = { Authorization: `Bearer ${ token}` }
 
 const sentFileToDocalysis = async (fileName, url) => {
   const file = {
@@ -20,12 +20,12 @@ const sentFileToDocalysis = async (fileName, url) => {
 }
 
 const getFileData = async (fileId) => {
-  const response = await docalysisApi.get(`/files/${fileId}/info`, { headers })
+  const response = await docalysisApi.get(`/files/${ fileId }/info`, { headers })
   return checkDocalysisResponseSuccess(response)
 }
 
 const askToFile = async (fileId, data) => {
-  const response = await docalysisApi.get(`/files/${fileId}/chat`, { headers, data })
+  const response = await docalysisApi.get(`/files/${ fileId }/chat`, { headers, data })
   return checkDocalysisResponseSuccess(response)
 }
 
@@ -40,7 +40,7 @@ const createApi = ({
     log({ err })
     throw fileErrors.docalysisError
   }
-} = {}) => {
+} = { }) => {
   const api = axios.create({
     baseURL: encodeURI(baseUrl),
     timeout: 60000

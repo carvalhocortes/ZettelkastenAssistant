@@ -48,7 +48,7 @@ const testRequired = async (functionName, event, requiredField, expectedError) =
   await testError(functionName, modifiedEvent, 400, expectedError)
 }
 
-const uniqueEmail = () => `${uuid()}@example.com`
+const uniqueEmail = () => `${ uuid() }@example.com`
 
 const buildUser = (email = uniqueEmail(), password = 'GoodPass@123', permission) => ({
   name: 'John Doe',
@@ -92,7 +92,7 @@ const mockCreateMendeleyDocument = (response, statusResponse = 200) => {
 
 const mockCheckAndUpdateStatus = (fileId, response, statusResponse = 200) => {
   nock(docalysisBaseUrl)
-    .get(`/files/${fileId}/info`)
+    .get(`/files/${ fileId }/info`)
     .reply(statusResponse, response)
 }
 

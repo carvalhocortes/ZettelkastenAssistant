@@ -54,7 +54,7 @@ const buildHttp = (code, body) => {
 }
 
 const serializeResponseBody = (body) => {
-  const payload = typeof body === 'undefined' || body === null ? {} : body
+  const payload = typeof body === 'undefined' || body === null ? { } : body
   return JSON.stringify(payload)
 }
 

@@ -9,7 +9,7 @@ module.exports = {
   requiredField: (fieldName) => ({
     httpCode: 400,
     code: errorCode(1),
-    msg: `The field ${fieldName} are mandatory.`
+    msg: `The field ${ fieldName } are mandatory.`
   }),
   invalidToken: {
     httpCode: 401,
@@ -24,6 +24,6 @@ module.exports = {
   invalidUpdateField: (fieldName) => ({
     httpCode: 400,
     code: errorCode(4),
-    msg: `The ${fieldName} field is not updateable.`
+    msg: `The ${ fieldName } field is not updateable.`
   }),
 }

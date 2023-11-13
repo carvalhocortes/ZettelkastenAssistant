@@ -11,7 +11,7 @@ const mendeleyRedirect = process.env.MENDELEY_REDIRECT
 
 const getAuthUrl = async event => {
   const state = getToken(event.session.email, '1h', 'mendeleyOAuth').token
-  const url = `${mendeleyOAuthUrl}?client_id=${mendeleyId}&redirect_uri=${mendeleyRedirect}&response_type=code&scope=all&state=${state}`
+  const url = `${ mendeleyOAuthUrl} ?client_id=${ mendeleyId }&redirect_uri=${ mendeleyRedirect }&response_type=code&scope=all&state=${ state }`
   return { url }
 }
 

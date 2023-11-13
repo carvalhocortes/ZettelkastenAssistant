@@ -41,11 +41,11 @@ describe('Update users tests', () => {
     await testError(updateUserFunc, updateUserEvent, 400, errorsNumber.invalidBirthdaySchema)
   })
   it('Should return a error if sent user dont exist', async() => {
-    const updateUserEvent = buildEvent({ test: 'test'}, { email: 'any email' })
+    const updateUserEvent = buildEvent({ test: 'test' }, { email: 'any email' })
     await testError(updateUserFunc, updateUserEvent, 404, errorsNumber.inexistentEmail)
   })
   it('Should not accept repeated or weak passwords', async () => {
-    let updateUserEvent = buildEvent({ password: user.password}, { email: user.email })
+    let updateUserEvent = buildEvent({ password: user.password }, { email: user.email })
     await testError(updateUserFunc, updateUserEvent, 400, errorsNumber.passwordAlreadyUsed)
     updateUserEvent = buildEvent({ password: 'weakPass'}, { email: user.email })
     await testError(updateUserFunc, updateUserEvent, 400, errorsNumber.invalidPasswordSchema)

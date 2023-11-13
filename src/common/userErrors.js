@@ -4,7 +4,7 @@ module.exports = {
   invalidPassword:(remainingAttempts) => ({
     httpCode: 401,
     code: errorCode(1),
-    msg: `Invalid Password. You have ${remainingAttempts} attempts left.`
+    msg: `Invalid Password. You have ${ remainingAttempts } attempts left.`
   }),
   nonAuthorized: {
     httpCode: 401,
@@ -14,7 +14,7 @@ module.exports = {
   inexistentEmail: (email) => ({
     httpCode: 404,
     code: errorCode(3),
-    msg: `${email} not registered.`
+    msg: `${ email } not registered.`
   }),
   nonActivatableUser: {
     httpCode: 400,
@@ -34,7 +34,7 @@ module.exports = {
   userDontNeedToken: (email) => ({
     httpCode: 400,
     code: errorCode(7),
-    msg: `${email} was not locked.`
+    msg: `${ email } was not locked.`
   }),
   passwordAlreadyUsed: {
     httpCode: 400,

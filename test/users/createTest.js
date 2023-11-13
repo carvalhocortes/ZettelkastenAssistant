@@ -6,7 +6,7 @@ const userDb = require('../../src/db/userDb')
 
 const createUserFunc = require('../../src/lambda/users').createUser
 
-const uniqueEmail = () => `${uuid()}@example.com`
+const uniqueEmail = () => `${ uuid() }@example.com`
 
 const buildUser = (email = uniqueEmail()) => ({
   name: 'John Doe',
@@ -60,7 +60,7 @@ describe('Create users tests', () => {
     await testError(createUserFunc, createUserEvent, 400, errorsNumber.invalidBirthdaySchema)
   })
   it('Should not create user with invalid email', async () => {
-    const createUserEvent = buildEvent(buildUser(`${uuid()}.@invalidExample.com`))
+    const createUserEvent = buildEvent(buildUser(`${ uuid() }.@invalidExample.com`))
     await testError(createUserFunc, createUserEvent, 400, errorsNumber.invalidEmailSchema)
   })
   it('Should not create user with invalid password', async () => {

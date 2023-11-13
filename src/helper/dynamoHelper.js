@@ -89,29 +89,29 @@ const assembleUpdateExpression = (updateObject, keysToDelete) => {
   updateObject = sanitizeObject(updateObject)
   keysToDelete = sanitizeObject(keysToDelete)
   let updateExpression = ''
-  const expressionAttributeValues = {}
-  const expressionAttributeNames = {}
+  const expressionAttributeValues = { }
+  const expressionAttributeNames = { }
   const attributesToDelete = []
   const attributesToUpdate = []
   if (updateObject){
     Object.keys(updateObject).forEach((key, index) => {
-      const valueKey = `:value${index + 1}`
-      expressionAttributeNames[`#${key}`] = key
+      const valueKey = `:value${ index + 1 }`
+      expressionAttributeNames[`#${ key }`] = key
       expressionAttributeValues[valueKey] = updateObject[key]
-      attributesToUpdate.push(`#${key} = ${valueKey}`)
+      attributesToUpdate.push(`#${ key } = ${ valueKey }`)
     })
   }
   if (keysToDelete){
     keysToDelete.forEach((key) => {
-      expressionAttributeNames[`#${key}`] = key
-      attributesToDelete.push(`#${key}`)
+      expressionAttributeNames[`#${ key }`] = key
+      attributesToDelete.push(`#${ key }`)
     })
   }
 
   if (attributesToUpdate.length > 0) {
     updateExpression += 'SET '
     attributesToUpdate.forEach((att, index) => {
-      updateExpression += `${att} `
+      updateExpression += `${ att } `
       if (index < attributesToUpdate.length - 1) {
         updateExpression += ', '
       }
@@ -120,7 +120,7 @@ const assembleUpdateExpression = (updateObject, keysToDelete) => {
   if (attributesToDelete.length > 0) {
     updateExpression += 'REMOVE '
     attributesToDelete.forEach((att, index) => {
-      updateExpression += `${att} `
+      updateExpression += `${ att } `
       if (index < attributesToDelete.length - 1) {
         updateExpression += ', '
       }
