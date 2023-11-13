@@ -15,9 +15,9 @@ describe('Mendeley Authorization tests', () => {
     user = await createActivatedUser()
     await authenticateUser(user)
   })
-  it('Should return a error if the token dont exist', async() => {
-    const inexistentTokenEvent = buildEvent(undefined, undefined, undefined, 'inexiste token' )
-    await testError(getAuthUrlFunc, inexistentTokenEvent, 401, errorsNumber.invalidToken)
+  it('Should return a error if the token is invalid', async() => {
+    const invalidTokenEvent = buildEvent(undefined, undefined, undefined, 'invalid token' )
+    await testError(getAuthUrlFunc, invalidTokenEvent, 401, errorsNumber.invalidToken)
   })
   it('Should return a url for a logged user', async() => {
     const response = await testSuccess(getAuthUrlFunc,  buildEvent())
